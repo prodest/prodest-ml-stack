@@ -1,0 +1,23 @@
+# Gerado em: https://sequencediagram.org/
+
+title Interação com a Stack de ML
+
+participant Cliente
+participant API
+participant Fila
+participant "Worker(s) Pub" as Worker
+
+Cliente->>API:**POST: inference**\n{'model_name': 'm',\n  'features': ['f1;f2;..;fn'],\n  'method': 'predict'}
+
+API->>Fila: Enfileira o Job
+API-->>Cliente:{'job_id': 'abc123...'}
+Cliente->>(2)API:**POST: status**\n{'job_id': 'abc123...'}
+API-->>Cliente:{'job_id': 'abc123...',\n  'model_name': 'm', \n  'method': 'predict', \n  'status': '**Queued**'\n   ...}
+
+Fila->>Worker:Retira o Job da fila
+Worker->>API:Atualiza o status do Job para '**Running**'
+note over Worker:Processa o Job de acordo com \no(s) modelo(s) publicado(s)
+Worker-->>(2)API:Retorna o resultado do processamento
+
+Cliente->>(2)API:**POST: status**\n{'job_id': ' abc123...'}
+API-->>Cliente:{'job_id': 'abc123...',\n  'model_name': 'm', \n  'method': 'predict', \n  'status': '**Done**'\n   ...\n  'response': ['label']}
