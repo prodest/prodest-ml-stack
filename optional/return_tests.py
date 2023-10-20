@@ -213,6 +213,7 @@ def preparar_testes(headers):
 
     print("\nDando um tempo para os jobs serem processados...", end="", flush=True)
     sleep(2)
+    print("\n")
 
 
 if __name__ == "__main__":
