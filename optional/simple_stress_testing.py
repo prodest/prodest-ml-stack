@@ -2,22 +2,22 @@
 # Este script executa testes de requisições à Stack de ML (versão Standalone). Os parâmetros de configuração do teste
 # estão no script 'optional/test_configs.py'.
 #
-# No início da tela do teste (ou de cada rodada) são mostradas algumas métricas utilizadas no teste. Segue abaixo  uma
+# No início da tela do teste (ou de cada rodada) são mostradas algumas métricas utilizadas no teste. Segue abaixo uma
 # breve descrição de cada uma delas:
 #
-# - 'Rodada': Indica qual a rodada que o teste está executando. A cada rodada todos os endpoints são testados, exceto o
+# - 'Rodada': indica qual a rodada que o teste está executando. A cada rodada todos os endpoints são testados, exceto o
 #   'get_feedback' que só pode ser executado, para um mesmo modelo, à cada 30 minutos.
-# - 'Delay de envio das requisições': Intervalo de tempo em que o script de teste fará cada requisição. Quanto menor
+# - 'Delay de envio das requisições': intervalo de tempo em que o script de teste fará cada requisição. Quanto menor
 #   for este intervalo, mais recursos computacionais serão exigidos do Worker e/ou da Stack para atender às requisições.
-# - 'Tempo decorrido': Tempo decorrido desde o início do teste, em segundos.
-# - 'Total de requisições': Total de requisições enviadas para a Stack de ML.
-# - 'Taxa de envio': Taxa de envio de requisições expressa em requisições/segundo.
-# - 'Total de sobrecargas': Total de vezes que o worker não conseguiu responder à uma requisição num tempo satisfatório.
-#   Esse tempo é diretamente relacionado com o parâmtero 'DELAY', configurado no arquivo 'optional/test_configs.py'.
+# - 'Tempo decorrido': tempo decorrido desde o início do teste, em segundos.
+# - 'Total de requisições': total de requisições enviadas para a Stack de ML.
+# - 'Taxa de envio': taxa de envio de requisições expressa em requisições/segundo.
+# - 'Total de sobrecargas': total de vezes que o worker não conseguiu responder a uma requisição num tempo satisfatório.
+#   Esse tempo é diretamente relacionado com o parâmetro 'DELAY', configurado no arquivo 'optional/test_configs.py'.
 #   Se o delay for muito baixo, uma quantidade maior de requisições são encaminhadas a cada segundo ao worker.
-# - 'Aguardando recuperação (pausa: Xs)': Quanto tempo o teste ficou esperando o worker se recuperar das sobrecargas,
+# - 'Aguardando recuperação (pausa: Xs)': quanto tempo o teste ficou esperando o worker se recuperar das sobrecargas,
 #   utilizando uma pausa de X segundos.
-# - 'Recuperação/tempo decorrido': Percentual do tempo decorrido do teste que foi gasto aguardando o worker se
+# - 'Recuperação/tempo decorrido': percentual do tempo decorrido do teste que foi gasto aguardando o worker se
 #   recuperar das sobrecargas. Se este percentual estiver muito alto, é aconselhável aumentar o tempo de delay ou
 #   aumentar quantidade de CPU do worker, esta alteração é feita no arquivo de configuração do docker-compose.
 # ----------------------------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ TOTAL_REQUESTS = 0
 # Quantidade de vezes que o worker sobrecarregou
 TOTAL_OVERLOAD = 0
 
-# Tempo que o teste espera para o worker se recurerar de uma sobrecarga
+# Tempo que o teste espera para o worker se recuperar de uma sobrecarga
 DELAY_PER_OVERLOAD = 10 * DELAY
 
 # Códigos para impressão de mensagens coloridas no terminal

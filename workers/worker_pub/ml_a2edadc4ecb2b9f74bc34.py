@@ -96,7 +96,7 @@ class WeakObj:
 
 def ack_message(ch, delivery_tag):
     """
-    Reconhece (ack) uma mensagem recebida pela a função 'do_work'.
+    Reconhece (ack) uma mensagem recebida pela função 'do_work'.
         :param ch: Canal pika.
         :param delivery_tag: Tag referente à mensagem que será reconhecida.
     """
@@ -113,7 +113,7 @@ def do_work(ch, delivery_tag, body):
         :param delivery_tag: Tag referente à mensagem recebida.
         :param body: Corpo da mensagem recebida.
     """
-    # OBS.: Utilizando o weakref para deixar a função mais robusta, pois a depender do modelo, podem vir dados pesados.
+    # OBS.: utilizando o weakref para deixar a função mais robusta, pois a depender do modelo, podem vir dados pesados.
     # Portanto, tenta-se garantir com o weakref que não haja objetos grandes ocupando a memória desnecessariamente
     json_data_obj = WeakObj(json.loads(body))
     json_data_wref = weakref.ref(json_data_obj)

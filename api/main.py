@@ -7,9 +7,9 @@
 # - O Cliente envia uma requisição para interagir com um modelo através do endpoint '/inference'.
 #
 # - No momento em que um worker pega uma requisição que está na fila, ele atualiza o status através do endpoint
-#   '/attstatus)' para 'running', atende a requisição e informa o resultado através do endpoint '/retorno'.
+#   '/attstatus' para 'running', atende a requisição e informa o resultado através do endpoint '/retorno'.
 #
-# - A qualquer momento, o cliente que fez a requisição pode consultar o status através do endpoint '/status'. Se o
+# - A qualquer momento, o cliente que fez a requisição pode consultar o status através do endpoint '/status'. Se
 #   o worker já tiver atendido e retornado, o resultado é enviado para o cliente.
 # --------------------------------------------------------------------------------------------------------------------
 from time import time
@@ -22,7 +22,7 @@ from utils import ObjectId, TOKEN, STK_VERSION, LOGGER, CLIENT_BD, ADVWORKID_CRE
     generate_hash, insert_doc, validate_request, retrieve_doc, update_doc, save_queue_registry, \
     get_queue_registry_startup, retrieve_docs_feedback, validate_params
 
-# Obtém o registro das filas no inicio da API
+# Obtém o registro das filas no início da API
 QUEUE_REG = get_queue_registry_startup()
 
 # Parâmetros para fazer o reload do registro das filas para obter as atualizações feitas por outras instâncias da API
@@ -56,7 +56,7 @@ def reload_queue_registry():
 #   https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/#exclude-from-openapi
 #   https://fastapi.tiangolo.com/tutorial/schema-extra-example/#__tabbed_4_2
 
-# Serve para possibilitar a autenticação através da interface do Swagger para envio do token de autorização
+# Possibilita a autenticação através da interface do Swagger para envio do token de autorização
 auth_header = APIKeyHeader(name='Authorization', scheme_name='Bearer token')
 
 # Mostra uma descrição na página de documentação gerada automaticamente pelo Swagger
@@ -484,7 +484,7 @@ async def get_feedback(cr: Annotated[
         initial_date = req_info['initial_date']
         end_date = req_info['end_date']
 
-        # Obtém o timestamp agora para que seja considerado o tempo de pesquisa no banco e o processamento do retorno
+        # Obtém o timestamp agora para considerar o tempo de pesquisa no banco e o processamento do retorno
         timestamp = time()
 
         try:
@@ -515,7 +515,7 @@ async def get_feedback(cr: Annotated[
         y_true = []
         qtd_labels = 0
 
-        # Quantidade de jobs que foram considerados para o feedback. Esta quantidade pode ser diferente da que foi
+        # Quantidade de jobs considerados para o feedback. Esta quantidade pode ser diferente da que foi
         # reportada pela função 'retrieve_docs_feedback', por conta de que um job de predict pode ter mais de um label
         # na resposta, assim, pode acontecer de atingir a quantidade máxima de labels com um número menor de jobs
         qtd_jobs_feedback_computados = 0
@@ -627,7 +627,7 @@ async def attstatus(info: Request, authorization: Optional[str] = Header(None, i
         result = update_doc("col_jobs", "job_id", job_id, {'status': new_status})
 
         if result.modified_count:
-            return {'status': "Done", 'response': ""}  # Não retorna detalhes pois o worker não grava esses dados no log
+            return {'status': "Done", 'response': ""}  # Não retorna detalhes porque o worker não salva isso no log
         else:
             return {'status': "Error", 'response': f"Não foi possível encontrar o job {job_id}"}
     except BaseException as e:
@@ -656,7 +656,7 @@ async def retorno(info: Request, authorization: Optional[str] = Header(None, inc
             campos_atualizar = {'status': return_status, 'queue_response_time_sec': req_info['queue_response_time_sec'],
                                 'total_response_time_sec': total_response_time_sec, 'response': req_info['response']}
             update_doc("col_jobs", "_id", result['_id'], campos_atualizar)
-            return {'status': "Done", 'response': ""}  # Não retorna detalhes pois o worker não grava esses dados no log
+            return {'status': "Done", 'response': ""}  # Não retorna detalhes porque o worker não salva isso no log
         else:
             return {'status': "Error", 'response': f"Não foi possível encontrar o job {job_id}"}
     except BaseException as e:
@@ -679,7 +679,7 @@ async def advworkid(info: Request):
         if worker_id:
             LOGGER.info(f"Registrando o worker: {worker_id} ...")
 
-            # Registra os modelos que são atendidos pelo worker
+            # Registra os modelos atendidos pelo worker
             for m in models:
                 if m not in QUEUE_REG:  # Registra se for novo
                     QUEUE_REG[m] = worker_id

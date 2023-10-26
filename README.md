@@ -31,7 +31,7 @@ definida na biblioteca de ML do Prodest ([**mllibprodest**](https://pypi.org/pro
 
 **Interações:**
 
-A imagem abaixo ilustra as interações entre os componentes da Stack (à esquerda);  e entre a aplicação cliente e a Stack (à direita). 
+A imagem abaixo ilustra as interações entre os componentes da Stack (à esquerda); e entre a aplicação cliente e a Stack (à direita). 
 Cabe observar que:
 
 - Nem todos os componentes da Stack se comunicam, por exemplo, somente a **API** interage com o componente **Database**. Por outro 
@@ -44,7 +44,7 @@ e recebe o ID do Job para consultar o *status* posteriormente. Dessa forma, a ap
 retorno da API.
 - As requisições de **status** e para **feedback** são atendidas diretamente pela API, ou seja, não há necessidade de enfileiramento.
 
-**NOTA:** Também para simplificar, nem todas as interações da aplicação cliente com a API foram representadas, porém a lógica é a mesma
+**NOTA:** Também para simplificar, nem todas as interações da aplicação cliente com a API foram representadas, porém, a lógica é a mesma
 para a maioria das interações: O cliente envia a requisição; recebe o ID do Job; e consulta posteriormente para verificar se o processamento
 do job terminou, caso tenha terminado, recebe a resposta.
 
@@ -57,14 +57,14 @@ do job terminou, caso tenha terminado, recebe a resposta.
 - Computador com sistema Linux; ou Windows utilizando [**WSL - Windows Subsystem for Linux**](https://learn.microsoft.com/pt-br/windows/wsl/install).
 - **Python >= 3.10.** Instruções: [Linux (Geralmente já vem instalado por padrão)](https://python.org.br/instalacao-linux) ou [Windows](https://www.python.org/downloads/windows).
 - [**Docker**](https://docs.docker.com/get-started/overview): Caso ainda não possua em seu computador, será necessário instalar. **DICA:** 
-Instale o **Docker** dentro do Linux do WSL, utilizando o procedimento, por exemplo para o [**Ubuntu**](https://docs.docker.com/engine/install/ubuntu/)
+Instale o **Docker** dentro do Linux do WSL, utilizando o procedimento, por exemplo, para o [**Ubuntu**](https://docs.docker.com/engine/install/ubuntu/)
 (distribuição padrão do WSL). Caso tenha escolhido outra distribuição, utilize o procedimento específico para ela 
 ([**escolha aqui**](https://docs.docker.com/engine/install/#server)).
 
 **NOTA:** Se o seu computador navega na Internet através de um [**proxy**](https://pt.wikipedia.org/wiki/Proxy), será 
 necessário fazer estas configurações: no [**Linux (WSL)**](https://linuxstans.com/how-to-set-up-proxy-ubuntu/) e 
-[**Docker**](https://docs.docker.com/network/proxy/#configure-the-docker-client), ambas via linha de comando. Porém, alterando as configurações de 
-acordo com as informações do proxy da sua rede e de suas credenciais de usuário, caso o proxy solicite autenticação.
+[**Docker**](https://docs.docker.com/network/proxy/#configure-the-docker-client), ambas via linha de comando. Porém, alterando as configurações conforme 
+as informações do proxy da sua rede e de suas credenciais de usuário, caso o proxy solicite autenticação.
 
 ### (Opcional) Provisionar o Portainer.
 
@@ -110,7 +110,9 @@ git clone -b 1.6.0 --single-branch https://github.com/prodest/prodest-ml-stack.g
 ```
 **ATENÇÃO:** Se for fazer os testes utilizando um modelo próprio; ou um que foi disponibilizado para publicação:
 - Descompacte o arquivo 'publicar.zip';
-- Copie a pasta **publicar** (a pasta toda, não somente o conteúdo dela) para dentro da pasta **prodest-ml-stack**.
+- Copie a pasta **publicar** (a pasta toda, não somente o conteúdo dela) para dentro da pasta **prodest-ml-stack**;
+- Ao seguir o passo **1.2**, responda '**no**' para a pergunta '**Deseja clonar e utilizar o modelo de exemplo...**', feita pelo *script* **build.sh**, 
+e continue seguindo as instruções dele.
 
 ### 1.2. Construir as imagens e subir o ambiente.
 ```bash
@@ -120,6 +122,15 @@ cd prodest-ml-stack
 ```bash
 ./build.sh
 ```
+Se o processo de *build* ocorrer com sucesso, no final você terá uma tela conforme abaixo. Caso o processo falhe, 
+acompanhe as mensagens de erro e atenda ao que for solicitado. Em caso de erro, o *script* **build.sh** fará uma limpeza do 
+ambiente para evitar que containers e imagens que foram criados no processo e não estão sendo utilizados, fiquem ocupando 
+espaço no seu computador.
+
+![Stack](docs/build_finalizado.png)
+
+**NOTA:** Obtenha as credenciais para acesso aos recursos da *Stack* através do arquivo **'credentials_stack.txt'**. Ele se encontra no caminho: **'../temp_builder/'** (considerando que a pasta atual seja **'Stack'**).
+
 ### 1.3. Seguir os logs para acompanhar o uso da Stack.
 Abra outro terminal; entre na pasta criada no processo de clonagem do repositório e rode os comandos de lá. Dessa forma você conseguirá seguir os passos em um terminal e acompanhar os logs em outro.
 
@@ -130,12 +141,9 @@ cd stack
 ./docker-compose logs -f --tail 1 &
 ```
 
-**NOTA:** Obtenha as credenciais para acesso aos recursos da *Stack* através do arquivo **'credentials_stack.txt'**. Ele se encontra no caminho: **'../temp_builder/'** (considerando que a pasta atual seja **'Stack'**).
-
-
 ## 2. Treinar um modelo para colocar em produção
 
-Considerando que: A rotina de treinamento é executada esporadicamente; e que a economia de recursos computacionais é bem vinda; 
+Considerando que: A rotina de treinamento é executada esporadicamente; e que a economia de recursos computacionais é bem-vinda; 
 os containers **stack-mltraining-model-1** (treinamento) e **stack-worker-retrain-1** (retreino) estão parados e deverão ser 
 iniciados somente para fazer o treino/retreino e, logo após, serem parados novamente.
 
@@ -175,7 +183,7 @@ Rode o comando abaixo para acessar a console do container.
 docker start stack-mltraining-model-1 && docker exec -it stack-mltraining-model-1 bash
 # Altere configurações; verifique logs; rode os comandos que desejar; etc.
 ```
-Depois de encerrar a utilização, rode os comandos para sair e parar o container.
+Após encerrar a utilização, rode os comandos para sair e parar o container.
 ```bash
 exit
 docker stop stack-mltraining-model-1
@@ -200,15 +208,15 @@ Rode o comando para subir o serviço.
 ./docker-compose restart worker-pub
 ```
 
-Consulte **novamente** a aba '**Queues and Streams**' e perceba que: Após o reinício do serviço worker-pub, uma fila foi criada.
+Consulte **novamente** a aba '**Queues and Streams**' e perceba que: após o reinício do serviço worker-pub, uma fila foi criada.
 
 ### 3.3. Faça as requisições para testar a interação com a API.
 
 Substitua os valores das chaves abaixo, que serão usadas nas chamadas utilizando o [**client curl**](https://curl.se/download.html), como segue:
 
-- **'Authorization'**: Substitua COLE_AQUI_O_TOKEN pelo *token* de acesso à API (está no arquivo *'credentials_stack.txt'*).
-- **'model_name'**: Troque COLE_AQUI_O_NOME_DO_MODELO pelo nome do modelo que será utilizado para atender às requisições. Nesse exemplo, será **CLF_CYBER_BULLYING_TWEETS**
-- **'job_id'**: Altere COLE_AQUI_O_JOB_ID, conforme valor retornado nas requisições feitas à API.
+- **'Authorization'**: substitua COLE_AQUI_O_TOKEN pelo *token* de acesso à API (está no arquivo *'credentials_stack.txt'*).
+- **'model_name'**: troque COLE_AQUI_O_NOME_DO_MODELO pelo nome do modelo que será utilizado para atender às requisições. Nesse exemplo, será **CLF_CYBER_BULLYING_TWEETS**
+- **'job_id'**: altere COLE_AQUI_O_JOB_ID, conforme valor retornado nas requisições feitas à API.
 
 Abra um prompt de comando ou terminal; copie e cole os exemplos a seguir (passos 3.3.x) para testar as requisições. Acompanhe 
 os logs através do terminal aberto no passo **1.3**.
@@ -289,10 +297,10 @@ curl -X 'POST' \
 ###  3.3.5. Informe o feedback para o modelo.
 
 O campo '**feedback**' deve ser preenchido com um ou mais labels que o usuário acredita que estão corretos. Os
-labels devem ser os mesmos que foram utilizados no treinamento (mesma escrita e tipo de 'caixa' das letras', *case sensitive*). 
+labels devem ser os mesmos utilizados no treinamento (mesma escrita e tipo de 'caixa' das letras', *case sensitive*). 
 No caso de um usuário perceber um label no qual o modelo não foi treinado, a instrução é procurar o responsável pelo modelo.
 
-**NOTA:** A quantidade de labels dever ser a mesma que foi respondida no retorno da requisição que gerou o *'job_id'* que está 
+**NOTA:** A quantidade de labels dever ser a mesma respondida no retorno da requisição que gerou o *'job_id'* que está 
 sendo consultado. Nesse exemplo específico, está sendo informado o feedback para o retorno da primeira requisição de teste (passo **3.3.1**). 
 
 ```bash
@@ -330,7 +338,7 @@ curl -X 'POST' \
 
 ## 4. Testar o worker de retreino
 
-O container  **stack-worker-retrain-1** (retreino), assim como o de treinamento, deve ficar parado e ser iniciado somente 
+O container **stack-worker-retrain-1** (retreino), assim como o de treinamento, deve ficar parado e ser iniciado somente 
 para fazer o retreino e ser parado novamente.
 
 Ao executar o comando abaixo, o container é iniciado; o retreino é executado; e o container é parado.
@@ -357,7 +365,7 @@ Rode o comando abaixo para acessar a console do container.
 docker start stack-worker-retrain-1 && docker exec -it stack-worker-retrain-1 bash
 # Verifique logs, rode os comandos que desejar, etc.
 ```
-Depois de encerrar a utilização, rode os comandos para sair e parar o container.
+Após encerrar a utilização, rode os comandos para sair e parar o container.
 ```bash
 exit
 docker stop stack-worker-retrain-1
@@ -377,7 +385,7 @@ curl http://localhost:8080/version
 
 Utilize os comandos abaixo para fazer uma verificação da utilização e dos dados salvos no banco de dados.
 
-**NOTA:** Esses comandos são simples e servem para fazer uma interação bem básica com o banco de dados. Acesse a 
+**NOTA:** Esses comandos são simples e permitem fazer uma interação bem básica com o banco de dados. Acesse a 
 [documentação](https://docs.mongodb.com/manual/reference/method) completa para mais informações.
 
 ```bash
@@ -437,7 +445,7 @@ pip install requests==2.31.0
 ```
 - Execute o script que fará o teste de *stress*; observe a execução e as mensagens na tela.
 
-**NOTA:** Edite o script '**simple_stress_testing.py**' e leia os comentários no inicio dele para obter informações sobre as métricas utilizadas no teste.
+**NOTA:** Edite o script '**simple_stress_testing.py**' e leia os comentários no início dele para obter informações sobre as métricas utilizadas no teste.
 
 ```bash
 python simple_stress_testing.py
@@ -454,9 +462,9 @@ o desempenho; etc. Explore bem a interface!
 
 **NOTA:** Dependendo da intensidade dos testes, por exemplo: valor de **DELAY** muito pequeno (verifique essa opção no arquivo 
 de configuração '**test_configs.py**'), podem ocorrer reinicializações do container Worker Pub por conta de exaustão de 
-recursos computacionais. Se isso ocorrer, diminua o valor do *delay* para que o Worker Pub tenha a capacidade de atender às 
-requisições. Outra alternativa é aumentar a quantidade de Workers Pub através do Portainer (clique no container **stack-worker-pub-1** 
-; depois clique na opção para 'Duplicar/Editar'; altere o nome para **stack-worker-pub-2** e clique no botão para fazer o 
+recursos computacionais. Se isso ocorrer, diminua o valor do *delay* para que o Worker Pub consiga atender às 
+requisições. Outra alternativa é aumentar a quantidade de Workers Pub através do Portainer (clique no container **stack-worker-pub-1**; 
+depois clique na opção para 'Duplicar/Editar'; altere o nome para **stack-worker-pub-2** e clique no botão para fazer o 
 depoly do container). Após o *deploy*, haverá uma cópia do Worker Pub para auxiliá-lo no atendimento das requisições. 
 
 ## 6. Links para acessar alguns componentes da Stack

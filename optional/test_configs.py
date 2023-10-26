@@ -7,7 +7,7 @@
 API_TOKEN = "COLE_AQUI_O_TOKEN"
 
 # Intervalo entre cada requisição em segundos.
-# Pode ser alterado, porém monitore para verificar se não causará exaustão dos recursos da Stack
+# Pode ser alterado, porém, monitore para verificar se não causará exaustão dos recursos da Stack
 DELAY = 0.5
 
 # Define se deve limpar a tela no final de cada rodada do teste. Se não quiser limpar, altere para 'False'
