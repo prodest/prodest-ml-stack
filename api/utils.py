@@ -147,7 +147,7 @@ CLIENT_BD = connect_db("ml_api_db")
 
 def get_queue_registry_startup():
     """
-    Obtém o registro das filas cadastradas, no inicio da API. Caso não exista, cria um.
+    Obtém o registro das filas cadastradas, no início da API. Caso não exista, cria um.
          :return: Dicionário contendo o registro das filas.
     """
     col = CLIENT_BD["col_queue_registry"]

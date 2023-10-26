@@ -1,7 +1,7 @@
 # --------------------------------------------------------------------------------------------------------------------
 # Este script gera credenciais automaticamente para substituir as credenciais padrões dos Dockerfiles e compose files
 # da Stack. Essas credenciais são gravadas em um arquivo chamado 'credentials_stack.txt' que é utilizado pelo script
-# 'modify_credentials_dockerfiles.sh' para modificar as credendiais.
+# 'modify_credentials_dockerfiles.sh' para modificar as credenciais.
 # --------------------------------------------------------------------------------------------------------------------
 from hashlib import sha256
 from time import time
