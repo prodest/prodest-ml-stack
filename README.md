@@ -110,7 +110,9 @@ git clone -b 1.6.0 --single-branch https://github.com/prodest/prodest-ml-stack.g
 ```
 **ATENÇÃO:** Se for fazer os testes utilizando um modelo próprio; ou um que foi disponibilizado para publicação:
 - Descompacte o arquivo 'publicar.zip';
-- Copie a pasta **publicar** (a pasta toda, não somente o conteúdo dela) para dentro da pasta **prodest-ml-stack**.
+- Copie a pasta **publicar** (a pasta toda, não somente o conteúdo dela) para dentro da pasta **prodest-ml-stack**;
+- Ao seguir o passo **1.2**, responda '**no**' para a pergunta '**Deseja clonar e utilizar o modelo de exemplo...**', feita pelo *script* **build.sh**, 
+e continue seguindo as instruções dele.
 
 ### 1.2. Construir as imagens e subir o ambiente.
 ```bash
@@ -120,6 +122,15 @@ cd prodest-ml-stack
 ```bash
 ./build.sh
 ```
+Se o processo de *build* ocorrer com sucesso, no final você terá uma tela conforme abaixo. Caso o processo falhe, 
+acompanhe as mensagens de erro e atenda ao que for solicitado. Em caso de erro, o *script* **build.sh** fará uma limpeza do 
+ambiente para evitar que containers e imagens que foram criados no processo e não estão sendo utilizados, fiquem ocupando 
+espaço no seu computador.
+
+![Stack](docs/build_finalizado.png)
+
+**NOTA:** Obtenha as credenciais para acesso aos recursos da *Stack* através do arquivo **'credentials_stack.txt'**. Ele se encontra no caminho: **'../temp_builder/'** (considerando que a pasta atual seja **'Stack'**).
+
 ### 1.3. Seguir os logs para acompanhar o uso da Stack.
 Abra outro terminal; entre na pasta criada no processo de clonagem do repositório e rode os comandos de lá. Dessa forma você conseguirá seguir os passos em um terminal e acompanhar os logs em outro.
 
@@ -129,9 +140,6 @@ cd stack
 ```bash
 ./docker-compose logs -f --tail 1 &
 ```
-
-**NOTA:** Obtenha as credenciais para acesso aos recursos da *Stack* através do arquivo **'credentials_stack.txt'**. Ele se encontra no caminho: **'../temp_builder/'** (considerando que a pasta atual seja **'Stack'**).
-
 
 ## 2. Treinar um modelo para colocar em produção
 
