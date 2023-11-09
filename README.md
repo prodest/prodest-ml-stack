@@ -381,7 +381,7 @@ siga em frente!
 curl http://localhost:8080/version
 ```
 
-### 5.2. Para verificar o servidor de banco de dados.
+### 5.2. Interação básica com o servidor de banco de dados.
 
 Utilize os comandos abaixo para fazer uma verificação da utilização e dos dados salvos no banco de dados.
 
@@ -419,9 +419,30 @@ Verifique os **4 últimos** jobs armazenados.
 db.col_jobs.find().sort({$natural: -1}).limit(4)
 ```
 
-Finalize a sessão.
+**(Opcional)** Criação de um usuário, com permissão somente para leitura, para consulta dos dados. Copie o comando abaixo 
+e cole na console do **mongosh**. Crie uma senha para o usuário, conforme solicitado.
 ```bash
-exit # sai do mongosh
+db.createUser(
+  {
+    user: "ro_user",
+    pwd:  passwordPrompt(),
+    roles: [ { role: "read", db: "ml_api_db" }]
+  }
+)
+```
+Finalize a sessão do **mongosh**.
+```bash
+exit
+```
+Se você criou o usuário '**ro_user**', teste o *login* com o comando abaixo:
+
+```bash
+mongosh mongodb://localhost --authenticationDatabase 'ml_api_db' --username ro_user
+```
+Finalize a interação.
+
+```bash
+exit
 exit # sai da console do container
 ```
 
