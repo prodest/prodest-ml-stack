@@ -8,8 +8,8 @@ ENV PY_INST_DIR=/usr/local/lib/python3.10/site-packages
 WORKDIR /tmp
 COPY modify_conf_mlflow.sh make_signup.py mlflow_cred.txt .
 
-RUN pip install --no-cache-dir --upgrade pip setuptools && pip install --no-cache-dir mlflow==2.8.1 boto3==1.29.2 \
-    matplotlib==3.8.1 numpy==1.26.2 && /tmp/modify_conf_mlflow.sh && rm /tmp/modify_conf_mlflow.sh
+RUN pip install --no-cache-dir --upgrade pip setuptools && pip install --no-cache-dir mlflow==2.9.2 boto3==1.34.7 \
+    matplotlib==3.8.2 numpy==1.26.2 && /tmp/modify_conf_mlflow.sh && rm /tmp/modify_conf_mlflow.sh
 
 WORKDIR /usr/local/bin
 COPY mlflow_init.sh .

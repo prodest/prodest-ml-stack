@@ -134,6 +134,12 @@ def rodar_testes(headers):
         if 'job_id' in teste['req'] and teste['req']['job_id'] == "JOB_PREDICT_FEEDBACK":
             teste['req']['job_id'] = JOB_PREDICT_FEEDBACK
 
+        if 'detail' in teste['resp'] and 'input' in teste['resp']['detail'][0]:
+            if type(teste['resp']['detail'][0]['input']) is dict:
+                if 'job_id' in teste['resp']['detail'][0]['input'] and \
+                        teste['resp']['detail'][0]['input']['job_id'] == "JOB_PREDICT_FEEDBACK":
+                    teste['resp']['detail'][0]['input']['job_id'] = JOB_PREDICT_FEEDBACK
+
         if 'job_id' in teste['req'] and teste['req']['job_id'] == "JOB_ID_INFO":
             teste['req']['job_id'] = JOB_ID_INFO
             msg_split = teste['resp']['response'].split("#")
