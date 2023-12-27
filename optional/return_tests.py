@@ -148,8 +148,20 @@ def rodar_testes(headers):
         if 'initial_date' in teste['req'] and teste['req']['initial_date'] == "DATA_GET_FEEDBACK":
             teste['req']['initial_date'] = DATA_GET_FEEDBACK
 
+        if 'detail' in teste['resp'] and 'input' in teste['resp']['detail'][0]:
+            if type(teste['resp']['detail'][0]['input']) is dict:
+                if 'initial_date' in teste['resp']['detail'][0]['input'] and \
+                        teste['resp']['detail'][0]['input']['initial_date'] == "DATA_GET_FEEDBACK":
+                    teste['resp']['detail'][0]['input']['initial_date'] = DATA_GET_FEEDBACK
+
         if 'end_date' in teste['req'] and teste['req']['end_date'] == "DATA_GET_FEEDBACK":
             teste['req']['end_date'] = DATA_GET_FEEDBACK
+
+        if 'detail' in teste['resp'] and 'input' in teste['resp']['detail'][0]:
+            if type(teste['resp']['detail'][0]['input']) is dict:
+                if 'end_date' in teste['resp']['detail'][0]['input'] and \
+                        teste['resp']['detail'][0]['input']['end_date'] == "DATA_GET_FEEDBACK":
+                    teste['resp']['detail'][0]['input']['end_date'] = DATA_GET_FEEDBACK
 
         print(f"\n{GREEN}Teste #{num_test}: {teste['desc']}{RESET}")
         r = requests.post(f"{API_URL}/{teste['endpoint']}", json=teste['req'], headers=headers)
