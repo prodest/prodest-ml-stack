@@ -105,8 +105,8 @@ tags_metadata = [
 # Classes criadas somente para auxiliar na documentação automática do Swagger
 class InferenceRequest(BaseModel):
     model_name: str
-    features: Union[list[str], None]
-    targets: Union[list[str], None]
+    features: Optional[list] = None
+    targets: Optional[list] = None
     method: str
 
 
@@ -167,7 +167,7 @@ async def version():
 async def inference(cr: Annotated[
                           InferenceRequest,
                           Body(
-                              examples={
+                              openapi_examples={
                                   "predict": {
                                       "summary": "Exemplo de predict",
                                       "description": "Solicita a predição de um conjunto de features separadas "
@@ -281,7 +281,7 @@ async def inference(cr: Annotated[
 async def get_status(cr: Annotated[
                         StatusRequest,
                         Body(
-                            examples={
+                            openapi_examples={
                                 'status': {
                                     "summary": "Exemplo de solicitação de status",
                                     "description": "Verifica o status de uma solicitação enviada para a API, através "
@@ -356,7 +356,7 @@ async def get_status(cr: Annotated[
 async def feedback(cr: Annotated[
                       FeedbackRequest,
                       Body(
-                          examples={
+                          openapi_examples={
                               "feedback": {
                                   "summary": "Exemplo de feedback",
                                   "description": "Informa o feedback em relação às inferências feitas pelos "
@@ -432,7 +432,7 @@ async def feedback(cr: Annotated[
 async def get_feedback(cr: Annotated[
                           GetFeedbackRequest,
                           Body(
-                              examples={
+                              openapi_examples={
                                   "get_feedback": {
                                       "summary": "Exemplo de solicitação de feedback",
                                       "description": "Solicita o feedback em relação às inferências feitas por um "
