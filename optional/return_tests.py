@@ -125,6 +125,12 @@ def rodar_testes(headers):
         if 'model_name' in teste['resp'] and teste['resp']['model_name'] == "MODEL_NAME":
             teste['resp']['model_name'] = MODEL_NAME
 
+        if 'detail' in teste['resp'] and 'input' in teste['resp']['detail'][0]:
+            if type(teste['resp']['detail'][0]['input']) is dict:
+                if 'model_name' in teste['resp']['detail'][0]['input'] and \
+                        teste['resp']['detail'][0]['input']['model_name'] == "MODEL_NAME":
+                    teste['resp']['detail'][0]['input']['model_name'] = MODEL_NAME
+
         if 'features' in teste['req'] and teste['req']['features'] == "FEATURES":
             teste['req']['features'] = FEATURES
 
