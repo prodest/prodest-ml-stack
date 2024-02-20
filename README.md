@@ -131,6 +131,8 @@ espaço no seu computador.
 
 **NOTA:** Obtenha as credenciais para acesso aos recursos da *Stack* através do arquivo **'credentials_stack.txt'**. Ele se encontra no caminho: **'../temp_builder/'** (considerando que a pasta atual seja **'Stack'**).
 
+# TODO: INCLUIR INFORMAÇÃO SOBRE O HEALTH CHECK DO CONTAINER DO WORKER
+
 ### 1.3. Seguir os logs para acompanhar o uso da Stack.
 Abra outro terminal; entre na pasta criada no processo de clonagem do repositório e rode os comandos de lá. Dessa forma você conseguirá seguir os passos em um terminal e acompanhar os logs em outro.
 
