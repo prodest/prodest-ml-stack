@@ -166,9 +166,9 @@ services:
         - api
     healthcheck:
         test: python /worker_pub/health_check.py
-        interval: 1200s
+        interval: 600s
         timeout: 120s
-        retries: 0
+        retries: 1
         start_period: 120s
 
   worker-retrain:
