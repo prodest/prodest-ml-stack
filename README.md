@@ -503,7 +503,7 @@ docker ps -a
 Ou através do **Portainer**. Segue abaixo uma breve descrição de cada um desses *status*:
 
 - **starting**: Indica que o container foi iniciado (já consegue processar os jobs), mas ainda não ocorreu a verificação 
-das versões dos modelos. A primeira verificação ocorrerá cerca de 12 minutos após o início do container.
+das versões dos modelos. A primeira verificação ocorrerá, aproximadamente, 12 minutos após o início do container.
 
 ![Starting](docs/container_starting.png)
 
