@@ -12,7 +12,7 @@ LOGGER = make_log("worker_pub_health_check.log")
 LOGGER.info("Instanciando o(s) modelo(s) de ML para realizar o health check do Worker...")
 try:
     MODELOS_CARREGADOS = Im.init_models()
-    # Obtém um modelo qualquer para utilizar os métodos 'convert_artifact_to_pickle' e 'convert_artifact_to_object'
+    # Obtém um modelo qualquer para utilizar o método 'convert_artifact_to_object'
     MODELO_AUX = MODELOS_CARREGADOS[list(MODELOS_CARREGADOS.keys())[0]]
 except BaseException as e:
     LOGGER.error(f"Não foi possível instanciar o(s) modelo(s). Mensagem do 'init_models': {e.__class__} - {e}",
