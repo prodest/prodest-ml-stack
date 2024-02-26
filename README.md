@@ -517,7 +517,7 @@ reiniciado para carregar os modelos atualizados.
 
 ![Unhealthy](docs/container_unhealthy.png)
 
-Para verificar o motivo do *status* está na condição **unhealthy**:
+Para verificar o motivo do *status* estar na condição **unhealthy**:
 
 Via linha de comando:
 
