@@ -525,7 +525,7 @@ Via linha de comando:
 docker inspect stack-worker-pub-1
 ```
 
-Para obter os detalhes que levaram a este *status* **Unhealthy**, procure na saida do comando acima pela chave **"Health": {**.
+Para obter os detalhes que levaram a este *status* **unhealthy**, procure na saida do comando acima pela chave **"Health": {**.
 
 Utilizando o Portainer:
 
