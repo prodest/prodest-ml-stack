@@ -536,6 +536,8 @@ na caixa '**Last output**', verifique a mensagem que informa o motivo do *status
 
 Caso o **Worker PUB** esteja com *status* **unhealthy**, rode o comando abaixo para reiniciar o container e carregar a 
 versão mais atual dos modelos:
+
+**NOTA:** Este comando deve ser executado de dentro da pasta **prodest-ml-stack/stack/**.
 ```bash
 ./docker-compose restart worker-pub
 ```
