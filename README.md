@@ -103,10 +103,10 @@ Clone a *release* mais atual.
 git clone https://github.com/prodest/prodest-ml-stack.git
 ```
 
-Ou, se for **extremamente necessário**, escolha outra mais antiga. No comando abaixo, substitua **1.6.5** (que é a tag 
+Ou, se for **extremamente necessário**, escolha outra mais antiga. No comando abaixo, substitua **1.6.6** (que é a tag 
 da *release* mais atual) pela **tag** da *release* que deseja clonar.
 ```bash
-git clone -b 1.6.5 --single-branch https://github.com/prodest/prodest-ml-stack.git
+git clone -b 1.6.6 --single-branch https://github.com/prodest/prodest-ml-stack.git
 ```
 **ATENÇÃO:** Se for fazer os testes utilizando um modelo próprio; ou um que foi disponibilizado para publicação:
 - Descompacte o arquivo 'publicar.zip';
@@ -487,6 +487,60 @@ recursos computacionais. Se isso ocorrer, diminua o valor do *delay* para que o 
 requisições. Outra alternativa é aumentar a quantidade de Workers Pub através do Portainer (clique no container **stack-worker-pub-1**; 
 depois clique na opção para 'Duplicar/Editar'; altere o nome para **stack-worker-pub-2** e clique no botão para fazer o 
 depoly do container). Após o *deploy*, haverá uma cópia do Worker Pub para auxiliá-lo no atendimento das requisições. 
+
+### 5.4. Entender os status do container Worker PUB.
+
+No ciclo de vida do container **Worker PUB** estão previstos alguns *status* que são referentes às versões dos modelos que estão 
+em produção. Estes *status* podem ser consultados:
+
+Via linha de comando:
+
+```bash
+docker ps -a
+```
+![Status_cli](docs/container_status_cli.png)
+
+Ou através do **Portainer**. Segue abaixo uma breve descrição de cada um desses *status*:
+
+- **starting**: Indica que o container foi iniciado (já consegue processar os jobs), mas ainda não ocorreu a verificação 
+das versões dos modelos. A primeira verificação ocorrerá, aproximadamente, 12 minutos após o início do container.
+
+![Starting](docs/container_starting.png)
+
+- **healthy**: O container foi iniciado e todos os modelos estão na sua versão mais atual. Este *status* será o padrão 
+enquanto o container estiver rodando e os modelos estiverem atualizados.
+
+![Healthy](docs/container_healthy.png)
+
+- **unhealthy**: Indica que o container **Worker PUB** está rodando com um ou mais modelos desatualizados e precisa ser 
+reiniciado para carregar os modelos atualizados.
+
+![Unhealthy](docs/container_unhealthy.png)
+
+Para verificar o motivo do *status* estar na condição **unhealthy**:
+
+Via linha de comando:
+
+```bash
+docker inspect stack-worker-pub-1
+```
+
+Para obter os detalhes que levaram a este *status* **unhealthy**, procure na saida do comando acima pela chave **"Health": {**.
+
+Utilizando o Portainer:
+
+Clique no nome do container, conforme destacado em verde na figura anterior, e procure a seção '**Container health**'; 
+na caixa '**Last output**', verifique a mensagem que informa o motivo do *status* está como **unhealthy**.
+
+![Status_health_check](docs/container_status_health_check.png)
+
+Caso o **Worker PUB** esteja com *status* **unhealthy**, rode o comando abaixo para reiniciar o container e carregar a 
+versão mais atual dos modelos:
+
+**NOTA:** Este comando deve ser executado de dentro da pasta **prodest-ml-stack/stack/**.
+```bash
+./docker-compose restart worker-pub
+```
 
 ## 6. Links para acessar alguns componentes da Stack
 

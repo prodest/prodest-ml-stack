@@ -339,6 +339,21 @@ def on_message(ch, method_frame, _header_frame, body, args):
 if __name__ == "__main__":
     LOGGER.info("[*] Iniciando o processamento da engine de ML...")
 
+    # Guarda as versões de cada modelo para auxiliar na realização de health check do container
+    models_ver = {}
+
+    for nome_modelo, modelo in MODELOS.items():
+        models_ver[nome_modelo] = modelo.get_model_version()
+
+    # Obtém um modelo qualquer para utilizar o método 'convert_artifact_to_pickle' para auxiliar na persistência
+    modelo_aux = MODELOS[list(MODELOS.keys())[0]]
+
+    modelo_aux.convert_artifact_to_pickle(model_name="", artifact=models_ver, file_name="runid_models.pkl", path="/tmp")
+    LOGGER.info("Arquivo de versões dos modelos, para realizar o health check do Worker, gerado com sucesso no caminho "
+                "'/tmp/runid_models.pkl'")
+
+    del models_ver, modelo_aux
+
     # Montando a requisição para informar o 'WORKER_ID' para a API
     url_advworkid = f"{API_URL}/advworkid"
     headers = {'charset': 'utf-8', 'Content-Type': 'application/json'}
