@@ -9,7 +9,7 @@ WORKDIR /tmp
 COPY modify_conf_mlflow.sh make_signup.py mlflow_cred.txt .
 
 RUN pip install --no-cache-dir --upgrade pip setuptools && pip install --no-cache-dir mlflow==2.9.2 boto3==1.34.7 \
-    matplotlib==3.8.2 numpy==1.26.2 && /tmp/modify_conf_mlflow.sh && rm /tmp/modify_conf_mlflow.sh
+    numpy==1.26.2 && /tmp/modify_conf_mlflow.sh && rm /tmp/modify_conf_mlflow.sh
 
 WORKDIR /usr/local/bin
 COPY mlflow_init.sh .
