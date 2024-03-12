@@ -9,7 +9,7 @@ from pathlib import Path
 # Cria (ou abre) o arquivo de logs para o script e retorna o logger para geração dos logs
 LOGGER = make_log("worker_pub_health_check.log")
 
-LOGGER.info("Instanciando o(s) modelo(s) de ML para realizar o health check do Worker...")
+LOGGER.info("[*] Instanciando o(s) modelo(s) de ML para realizar o health check do Worker...")
 try:
     MODELOS_CARREGADOS = Im.init_models()
     # Obtém um modelo qualquer para utilizar o método 'convert_artifact_to_object'
@@ -27,6 +27,7 @@ def verificar_dados_modelos():
     :return: 0, se os modelos possuem as mesmas versões; 1, caso contrário ou se acontecer algum erro.
     """
     if not Path.exists(Path("/tmp/runid_models.pkl")):
+        LOGGER.error("O arquivo com as versões dos modelos não foi encontrado no caminho '/tmp/runid_models.pkl'")
         return 1
 
     modelos_desatualizados = []
