@@ -2,6 +2,7 @@
 # Script responsável por fazer um health check para verificar se o Worker está com os modelos atualizados. Caso
 # exista algum modelo desatualizado, coloca o container no estado 'unhealthy'.
 # -------------------------------------------------------------------------------------------------------------------
+import warnings
 from mllibprodest.utils import make_log
 from mllibprodest.initiators.model_initiator import InitModels as Im
 from pathlib import Path
@@ -9,9 +10,13 @@ from pathlib import Path
 # Cria (ou abre) o arquivo de logs para o script e retorna o logger para geração dos logs
 LOGGER = make_log("worker_pub_health_check.log")
 
-LOGGER.info("Instanciando o(s) modelo(s) de ML para realizar o health check do Worker...")
+LOGGER.info("[*] Instanciando o(s) modelo(s) de ML para realizar o health check do Worker...")
 try:
-    MODELOS_CARREGADOS = Im.init_models()
+    # Evita os warnings que estão atrapalhando a saida do script
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore")
+        MODELOS_CARREGADOS = Im.init_models()
+
     # Obtém um modelo qualquer para utilizar o método 'convert_artifact_to_object'
     MODELO_AUX = MODELOS_CARREGADOS[list(MODELOS_CARREGADOS.keys())[0]]
 except BaseException as e:
@@ -27,6 +32,7 @@ def verificar_dados_modelos():
     :return: 0, se os modelos possuem as mesmas versões; 1, caso contrário ou se acontecer algum erro.
     """
     if not Path.exists(Path("/tmp/runid_models.pkl")):
+        LOGGER.error("O arquivo com as versões dos modelos não foi encontrado no caminho '/tmp/runid_models.pkl'")
         return 1
 
     modelos_desatualizados = []
