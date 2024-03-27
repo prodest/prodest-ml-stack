@@ -103,10 +103,10 @@ Clone a *release* mais atual.
 git clone https://github.com/prodest/prodest-ml-stack.git
 ```
 
-Ou, se for **extremamente necessário**, escolha outra mais antiga. No comando abaixo, substitua **1.6.7** (que é a tag 
+Ou, se for **extremamente necessário**, escolha outra mais antiga. No comando abaixo, substitua **1.6.8** (que é a tag 
 da *release* mais atual) pela **tag** da *release* que deseja clonar.
 ```bash
-git clone -b 1.6.7 --single-branch https://github.com/prodest/prodest-ml-stack.git
+git clone -b 1.6.8 --single-branch https://github.com/prodest/prodest-ml-stack.git
 ```
 **ATENÇÃO:** Se for fazer os testes utilizando um modelo próprio; ou um que foi disponibilizado para publicação:
 - Descompacte o arquivo 'publicar.zip';
@@ -174,8 +174,8 @@ e altere o **'Stage'** para **'Production'**.
 - Dê o nome **CLF_CYBER_BULLYING_TWEETS** para o modelo e clique em **'Register'**;
 - Na barra superior clique em **'Models'**;
 - Clique no link para a última versão do modelo que está em **'Latest Version'**;
-- Desative a opção **'New model registry UI'**;
-- Na opção **'Stage'** troque de **'None'** para **'Production'** e clique em OK.
+- Na opção **'Aliases'**, clique em **'Add'**;
+- Digite ***production*** e clique em **'Save aliases'**.
 
 ### 2.2. (Opcional) Acessar a console do container de treinamento.
 
