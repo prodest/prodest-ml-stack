@@ -266,6 +266,11 @@ def do_work(ch, delivery_tag, body):
                             retorno_modelo = f"O tipo de retorno do método 'get_model_info' está incorreto. Deve ser " \
                                              f"'dict' ou 'str', mas retornou '{tipo_retorno.__name__}'"
 
+                    # Prepara o retorno
+                    retorno_obj = WeakObj({'job_id': job_id, 'queue_response_time_sec': queue_response_time_sec})
+                    retorno_wref = weakref.ref(retorno_obj)
+                    retorno = retorno_wref()
+
                     # Obtém a versão do modelo para incluir no retorno
                     model_version_obj = WeakObj(modelo.get_model_version())
                     model_version_wref = weakref.ref(model_version_obj)
@@ -275,13 +280,9 @@ def do_work(ch, delivery_tag, body):
                     if tipo_retorno_model_version is not str:
                         tipo_retorno_ok = False
                         del retorno_modelo, model_version
+                        retorno.get_obj()['model_version'] = ""  # Para não dar erro de chave não encontrada na API
                         retorno_modelo = f"O tipo de retorno do método 'get_model_version' está incorreto. Deve ser " \
                                          f"'str', mas retornou '{tipo_retorno_model_version.__name__}'"
-
-                    # Prepara o retorno
-                    retorno_obj = WeakObj({'job_id': job_id, 'queue_response_time_sec': queue_response_time_sec})
-                    retorno_wref = weakref.ref(retorno_obj)
-                    retorno = retorno_wref()
 
                     if tipo_retorno_ok:
                         # Se o tipo do retorno do modelo for 'str' significa de aconteceu algum erro
