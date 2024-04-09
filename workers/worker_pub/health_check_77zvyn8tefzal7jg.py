@@ -25,18 +25,17 @@ def convert_artifact_to_object(file_name: str, path: str):
         arq = open(caminho_artefato, 'rb')
     except FileNotFoundError:
         LOGGER.error(f"Não foi possível converter o artefato '{file_name}'. O caminho '{caminho_artefato}' não foi "
-                     f"encontrado. Programa abortado!")
+                     f"encontrado.")
         exit(1)
     except PermissionError:
         LOGGER.error(f"Não foi possível converter o artefato '{file_name}' usando o caminho '{caminho_artefato}'. "
-                     f"Permissão de leitura negada. Programa abortado!")
+                     f"Permissão de leitura negada.")
         exit(1)
 
     try:
         objeto = pickle.load(arq)
     except pickle.UnpicklingError as e:
-        LOGGER.error(f"Não foi possível converter o artefato '{file_name}' com o Pickle (mensagem Pickle: {e}). "
-                     f"Programa abortado!")
+        LOGGER.error(f"Não foi possível converter o artefato '{file_name}' com o Pickle (mensagem Pickle: {e}).")
         exit(1)
 
     arq.close()
