@@ -165,7 +165,7 @@ services:
         - model-registry
         - api
     healthcheck:
-        test: python /worker_pub/health_check.py
+        test: python /worker_pub/health_check_77zvyn8tefzal7jg.py
         interval: 600s
         timeout: 120s
         retries: 1
