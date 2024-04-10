@@ -271,10 +271,24 @@ def do_work(ch, delivery_tag, body):
                     retorno_wref = weakref.ref(retorno_obj)
                     retorno = retorno_wref()
 
+                    # Obtém a versão do modelo para incluir no retorno
+                    model_version_obj = WeakObj(modelo.get_model_version())
+                    model_version_wref = weakref.ref(model_version_obj)
+                    model_version = model_version_wref()
+                    tipo_retorno_model_version = type(model_version.get_obj())
+
+                    if tipo_retorno_model_version is not str:
+                        tipo_retorno_ok = False
+                        del retorno_modelo, model_version
+                        retorno.get_obj()['model_version'] = ""  # Para não dar erro de chave não encontrada na API
+                        retorno_modelo = f"O tipo de retorno do método 'get_model_version' está incorreto. Deve ser " \
+                                         f"'str', mas retornou '{tipo_retorno_model_version.__name__}'"
+
                     if tipo_retorno_ok:
                         # Se o tipo do retorno do modelo for 'str' significa de aconteceu algum erro
                         if tipo_retorno is not str:
                             retorno.get_obj()['status'] = "Done"
+                            retorno.get_obj()['model_version'] = model_version.get_obj()
 
                             # Inclui as informações adicionais sobre o feedback vindas da API
                             if metodo == "get_feedback":

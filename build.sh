@@ -131,7 +131,7 @@ then
     cp -vR $base_path/publicar/worker_pub $base_path/workers_deploy/
     cp -vR $base_path/publicar/worker_retrain $base_path/workers_deploy/
     cp -v $base_path/workers/worker_pub/ml_a2edadc4ecb2b9f74bc34.py $base_path/workers_deploy/worker_pub/
-    cp -v $base_path/workers/worker_pub/health_check.py $base_path/workers_deploy/worker_pub/
+    cp -v $base_path/workers/worker_pub/health_check_77zvyn8tefzal7jg.py $base_path/workers_deploy/worker_pub/
     cp -v $base_path/workers/worker_retrain/retrain_46b1c135cdef278ddc3b2.py $base_path/workers_deploy/worker_retrain/
     cp -v $base_path/workers/training_model/Dockerfile $base_path/workers_deploy/training_model
     cp -v $base_path/workers/worker_pub/Dockerfile $base_path/workers_deploy/worker_pub

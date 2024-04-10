@@ -251,9 +251,9 @@ async def inference(cr: Annotated[
 
         try:
             # Coloca o status do job como 'Queued' e persiste
-            dados_add = {'job_id': job_id, 'model_name': model_name, 'method': method, 'datetime': timestamp,
-                         'status': 'Queued', 'queue_response_time_sec': -1, 'total_response_time_sec': -1,
-                         'response': ""}
+            dados_add = {'job_id': job_id, 'model_name': model_name, 'model_version': "", 'method': method,
+                         'datetime': timestamp, 'status': 'Queued', 'queue_response_time_sec': -1,
+                         'total_response_time_sec': -1, 'response': ""}
 
             # Chaves específicas para o predict
             if method == "predict":
@@ -319,6 +319,7 @@ async def get_status(cr: Annotated[
 
         if result:
             model_name = result['model_name']
+            model_version = result['model_version']
             method = result['method']
             status = result['status']
             datetime = result['datetime']
@@ -326,8 +327,8 @@ async def get_status(cr: Annotated[
             total_response_time_sec = result['total_response_time_sec']
             response = result['response']
 
-            ret = {'job_id': job_id, 'model_name': model_name, 'method': method, 'status': status,
-                   'datetime': datetime, 'queue_response_time_sec': queue_response_time_sec,
+            ret = {'job_id': job_id, 'model_name': model_name, 'model_version': model_version, 'method': method,
+                   'status': status, 'datetime': datetime, 'queue_response_time_sec': queue_response_time_sec,
                    'total_response_time_sec': total_response_time_sec, 'response': response}
 
             # Obtenção de chaves específicas dependendo do método
@@ -589,8 +590,8 @@ async def get_feedback(cr: Annotated[
 
         try:
             # Coloca o status do job como "Queued" e persiste
-            dados_add = {'job_id': job_id, 'model_name': model_name, 'method': "get_feedback", 'datetime': timestamp,
-                         'status': 'Queued', 'initial_date': initial_date, 'end_date': end_date,
+            dados_add = {'job_id': job_id, 'model_name': model_name, 'model_version': "", 'method': "get_feedback",
+                         'datetime': timestamp, 'status': 'Queued', 'initial_date': initial_date, 'end_date': end_date,
                          'queue_response_time_sec': -1, 'total_response_time_sec': -1, 'response': "",
                          'request_source': info.client.host}
             insert_doc("col_jobs", dados_add)
@@ -654,7 +655,8 @@ async def retorno(info: Request, authorization: Optional[str] = Header(None, inc
         if result:
             total_response_time_sec = time() - result['datetime']
             campos_atualizar = {'status': return_status, 'queue_response_time_sec': req_info['queue_response_time_sec'],
-                                'total_response_time_sec': total_response_time_sec, 'response': req_info['response']}
+                                'total_response_time_sec': total_response_time_sec, 'response': req_info['response'],
+                                'model_version': req_info['model_version']}
             update_doc("col_jobs", "_id", result['_id'], campos_atualizar)
             return {'status': "Done", 'response': ""}  # Não retorna detalhes porque o worker não salva isso no log
         else:
