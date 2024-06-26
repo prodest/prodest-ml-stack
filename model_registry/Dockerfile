@@ -1,7 +1,7 @@
 # https://hub.docker.com/_/python/
 FROM python:3.10
 
-# Pasta onde o Python será instalado. Ao alterar a versão do Python neste Dockerfile, Lembre-se de alterar a versão
+# Pasta onde o Python será instalado. Ao alterar a versão do Python neste Dockerfile, lembre-se de alterar a versão
 # nesta variável de ambiente também
 ENV PY_INST_DIR=/usr/local/lib/python3.10/site-packages
 
