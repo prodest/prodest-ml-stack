@@ -7,7 +7,7 @@ WORKDIR /worker_pub
 COPY . .
 
 RUN pip install --no-cache-dir --upgrade pip setuptools && pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir pika==1.3.2 requests==2.31.0
+    && pip install --no-cache-dir pika==1.3.2 requests==2.32.3
 
 RUN chown -R pubuser:pubuser /worker_pub && chgrp -R 0 /worker_pub && chmod -R g=u /worker_pub
 
