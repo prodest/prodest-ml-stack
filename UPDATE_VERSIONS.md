@@ -204,7 +204,7 @@ Perceba que a pasta **publicar** foi copiada para dentro da pasta da Stack, conf
 
 ![alt text](docs/pasta_stack_modelo.png)
 
-Caso tenha sido atualizada, observe o destaque para o arquivo da mllibprodest dentro das pastas dos ***workers* pub e retrain**, que estão dentro da pasta **publicar**, conforme instruido no **passo 4.4**.
+Caso tenha sido atualizada, observe o destaque para o arquivo da mllibprodest dentro das pastas dos ***workers* pub e retrain**, que estão dentro da pasta **publicar**, conforme instruído no **passo 4.4**.
 
 ![alt text](docs/pasta_stack_mllib_modelo.png)
 
@@ -382,7 +382,7 @@ git add .
 git commit -m "MENSAGEM INFORMATIVA"
 git push
 ```
-Onde: **"MENSAGEM INFORMATIVA"** é uma mensgem que descreva o *commit* realizado.
+Onde: **"MENSAGEM INFORMATIVA"** é uma mensagem que descreva o *commit* realizado.
 
 
 ### 10.2 Crie um *pull request*
