@@ -66,6 +66,12 @@ if not STK_VERSION:
     LOGGER.error("Não foi possível obter a variável de ambiente 'STACK_VERSION'")
     exit(1)
 
+# Obtém o nome da base de dados para autenticação do usuário
+DB_AUTH_SOURCE = env.get("DB_AUTH_SOURCE")
+if not DB_AUTH_SOURCE:
+    LOGGER.error("Não foi possível obter a variável de ambiente 'DB_AUTH_SOURCE'")
+    exit(1)
+
 # Obtém as credenciais para acesso ao banco de dados
 DB_USERNAME = env.get("MONGO_INITDB_ROOT_USERNAME")
 if not DB_USERNAME:
@@ -114,7 +120,7 @@ def connect_db(database_name: str):
         :param database_name: Nome da base de dados.
         :return: Instância de client conectado à base de dados.
     """
-    client = MongoClient(f"mongodb://%s:%s@{DB_SERVER_NAME}" % (DB_USERNAME, DB_PASSWORD))
+    client = MongoClient(f"mongodb://%s:%s@{DB_SERVER_NAME}" % (DB_USERNAME, DB_PASSWORD), authSource=DB_AUTH_SOURCE)
 
     try:
         client.admin.command('ping')

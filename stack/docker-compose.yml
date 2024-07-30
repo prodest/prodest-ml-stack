@@ -93,6 +93,7 @@ services:
       RABBITMQ_SERVER : queue
       RABBITMQ_PORT : "5672"
       DB_SERVER_NAME : database
+      DB_AUTH_SOURCE : admin
       ADVWORKID_CREDENTIAL : ${ADVWORKID_CREDENTIAL}
       API_TOKEN : ${API_TOKEN}
       API_TOKEN_WORKERS : ${API_TOKEN_WORKERS}
@@ -122,7 +123,7 @@ services:
       <<: [*stack-common-env, *common-variables]
       # Nome do bucket padrão onde o MLflow irá salvar os artefatos dos experimentos. Caso deseje alterar,
       # troque mlflow pelo nome do bucket que desejar
-      DEFAULT_ARTIFACT_ROOT : s3://mlflow
+      DEFAULT_ARTIFACT_ROOT : s3://mlflow/artefatos
     volumes:
       - ../model_registry/mlflow_data:/mlflow_data
     ports:

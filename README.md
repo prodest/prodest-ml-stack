@@ -103,10 +103,10 @@ Clone a *release* mais atual.
 git clone https://github.com/prodest/prodest-ml-stack.git
 ```
 
-Ou, se for **extremamente necessário**, escolha outra mais antiga. No comando abaixo, substitua **1.6.9** (que é a tag 
+Ou, se for **extremamente necessário**, escolha outra mais antiga. No comando abaixo, substitua **1.6.10** (que é a tag 
 da *release* mais atual) pela **tag** da *release* que deseja clonar.
 ```bash
-git clone -b 1.6.9 --single-branch https://github.com/prodest/prodest-ml-stack.git
+git clone -b 1.6.10 --single-branch https://github.com/prodest/prodest-ml-stack.git
 ```
 **ATENÇÃO:** Se for fazer os testes utilizando um modelo próprio; ou um que foi disponibilizado para publicação:
 - Descompacte o arquivo 'publicar.zip';
