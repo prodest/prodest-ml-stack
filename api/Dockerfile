@@ -2,7 +2,7 @@
 FROM python:3.10
 
 # Alterar sempre que houver mudança de versões da Stack e/ou da mllibprodest
-ENV STACK_VERSION="r1.6.9 (mllibprodest==1.8.6)"
+ENV STACK_VERSION="r1.6.10 (mllibprodest==1.8.6)"
 
 WORKDIR /data
 COPY *.py .
