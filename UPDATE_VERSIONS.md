@@ -16,7 +16,10 @@ Escolha os repositórios que serão atualizados:
 
 ### 1.1 Fork e clone
 
-Realize o *fork* dos repositórios escolhidos e clone cada um dos *forks* criados, conforme o [tutorial oficial do Github](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo). Para facilitar, escolha a plataforma e maneira que achar mais adequadas para o seu caso.
+Realize o *fork* dos repositórios escolhidos e clone cada um dos *forks* criados, conforme o [tutorial oficial do Github](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo). Lembre-se  
+de substituir o repositório informado no tutorial para teste pelo repositório de onde será feito o *fork*.
+
+Para facilitar, escolha a plataforma e maneira que achar mais adequadas para o seu caso.
 
 ![fork](docs/fork.png)
 
@@ -110,9 +113,9 @@ Procure pelo arquivo **pyproject.toml** que está dentro da pasta criada no proc
 
 - Retire a versão do Setup tools da linha: **requires = ['setuptools>=69.1.1']** deve ficar assim: **requires = ['setuptools']**
 
-- Retire as versões dos pacotes que constam na linha: **dependencies = ['minio==7.2.5', 'python-dotenv==1.0.1', ...]**. Deve ficar assim: **dependencies = ['minio', 'python-dotenv', ...]**
-
 - Altere a versão da mllibprodest somando 1 no último campo numérico na linha: **version = "1.8.5"**, que nesse exemplo ficará assim: **version = "1.8.6"**
+
+- Retire as versões dos pacotes que constam na linha: **dependencies = ['minio==7.2.5', 'python-dotenv==1.0.1', ...]**. Deve ficar assim: **dependencies = ['minio', 'python-dotenv', ...]**
 
 Depois das alterações realizadas, o arquivo deverá ficar parecido com a imagem abaixo.
 
@@ -120,7 +123,7 @@ Depois das alterações realizadas, o arquivo deverá ficar parecido com a image
 
 ![alt text](docs/pyproject_sem_versoes.png)
 
-## 3. (Se necessário) Faça o *build* da mllibprodest
+## 3. Faça o *build* da mllibprodest
 
 Caso os pacotes da **mllibprodest** precisarem ser atualizados, será preciso fazer o *build* da mllibprodest para gerar um pacote instalável pelo **pip**. Siga os passos abaixo:
 
@@ -173,7 +176,7 @@ Copie a pasta criada no processo de clonagem do *fork* do repositório da Stack 
 
 Copie a pasta **publicar**, que está dentro da pasta criada no processo de clonagem do *fork* do repositório do modelo de teste, para dentro da pasta com os arquivos da Stack que foi copiada para a pasta de teste no **passo 4.2**.
 
-### 4.4 (Se necessário) Copie a lib para o modelo-teste
+### 4.4 Copie a lib para o modelo-teste
 
 Se a **mllibprodest** foi atualizada, conforme **passo 3**, é mandatório que o modelo de teste seja atualizado com a nova versão da lib.
 
@@ -182,7 +185,7 @@ Para atualizar o modelo de teste com a versão atualizada da **mllibprodest**, c
 - publicar/worker_pub
 - publicar/worker_retrain
 
-Além disso, edite os arquivos **requirements.txt** constantes nas duas pastas (worker_pub e worker_retrain) e substitua a linha **mllibprodest==x.y.z**, ou somente **mllibprodest**, pelo nome do arquivo gerado pelo *build*, que nesse exemplo é **mllibprodest-1.8.6-py3-none-any.whl**, conforme imagens abaixo:
+Além disso, edite os arquivos **requirements.txt** constantes nas duas pastas (worker_pub e worker_retrain) e substitua a linha **mllibprodest** pelo nome do arquivo gerado pelo *build*, que nesse exemplo é **mllibprodest-1.8.6-py3-none-any.whl**, conforme imagens abaixo:
 
 - Antes:
 
@@ -298,7 +301,7 @@ Caso ocorram com sucesso, as execuções dos comandos acima gerarão os arquivos
 
 ![alt text](docs/arquivos_req_novos.png)
 
-### 7.2 - (Se necessário) Pacotes da mllibprodest
+### 7.2 - Pacotes da mllibprodest
 
 Se os pacotes da mllibprodest foram atualizados, obtenha as versões conforme instruções abaixo:
 
@@ -333,7 +336,7 @@ pip list --format=freeze > req_mllib.txt
 
 ## 8. Atualizar os arquivos dos *forks*
 
-De posse dos arquivos gerados no **passo 7**, faça o inverso do que foi feito nos **passos 2.1, 2.3 e 2.4 (se necessário)**. Em suma, retorne com as versões que foram instaladas no *build* da Stack.
+De posse dos arquivos gerados no **passo 7**, faça o inverso do que foi feito nos **passos 2.1, 2.3 e 2.4**. Em suma, retorne com as versões que foram instaladas no *build* da Stack.
 
 Por exemplo, para o pacote rich:
 
@@ -380,10 +383,9 @@ Antes de realizar o *pull request* faça *commit* e *push* das suas alterações
 ```
 git add .
 git commit -m "MENSAGEM INFORMATIVA"
-git push
+git push --set-upstream origin atualizar_pacotes
 ```
 Onde: **"MENSAGEM INFORMATIVA"** é uma mensagem que descreva o *commit* realizado.
-
 
 ### 10.2 Crie um *pull request*
 
