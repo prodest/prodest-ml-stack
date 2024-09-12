@@ -103,10 +103,10 @@ Clone a *release* mais atual.
 git clone https://github.com/prodest/prodest-ml-stack.git
 ```
 
-Ou, se for **extremamente necessário**, escolha outra mais antiga. No comando abaixo, substitua **1.6.10** (que é a tag 
+Ou, se for **extremamente necessário**, escolha outra mais antiga. No comando abaixo, substitua **1.6.11** (que é a tag 
 da *release* mais atual) pela **tag** da *release* que deseja clonar.
 ```bash
-git clone -b 1.6.10 --single-branch https://github.com/prodest/prodest-ml-stack.git
+git clone -b 1.6.11 --single-branch https://github.com/prodest/prodest-ml-stack.git
 ```
 **ATENÇÃO:** Se for fazer os testes utilizando um modelo próprio; ou um que foi disponibilizado para publicação:
 - Descompacte o arquivo 'publicar.zip';
@@ -489,10 +489,29 @@ requisições. Outra alternativa é aumentar a quantidade de Workers Pub atravé
 depois clique na opção para 'Duplicar/Editar'; altere o nome para **stack-worker-pub-2** e clique no botão para fazer o 
 depoly do container). Após o *deploy*, haverá uma cópia do Worker Pub para auxiliá-lo no atendimento das requisições. 
 
-### 5.4. Entender os status do container Worker PUB.
+### 5.4. Entender os *status* dos containers.
 
-No ciclo de vida do container **Worker PUB** estão previstos alguns *status* que são referentes às versões dos modelos que estão 
-em produção. Estes *status* podem ser consultados:
+
+No ciclo de vida dos containers  estão previstos alguns *status* que são referentes à saúde deles, ou seja, se 
+os containers estão rodando corretamente e as aplicações estão funcionando. As verificações dos *status* ocorrerão de 
+acordo com os intervalos de cada container, conforme tabela a seguir.
+
+| Componente  | Nome do container      | Nome do serviço | Intervalo de verificação |
+|-------------|------------------------|-----------------|--------------------------|
+| API         | stack-api-1            | api             | 5 minutos                |
+| Database    | stack-database-1       | database        | 10 minutos               |
+| Model Registry | stack-model-registry-1 | model-registry  | 10 minutos               |
+| Queue       | stack-queue-1          | queue           | 5 minutos                |
+| Storage     | stack-storage-1        | storage         | 10 minutos               |
+| Worker PUB  | stack-worker-pub-1     | worker-pub      | 10 minutos               |
+
+O container **Worker PUB** será utilizado nas imagens e exemplos dos passos **5.4.1** e **5.4.2**, mas estas instruções servem para todos os 
+containers da tabela anterior, basta substituir pelos nomes constantes nas colunas **'Nome do container'** ou **'Nome do serviço'**, 
+dependendo do caso.
+
+### 5.4.1. Consultar os *status*.
+
+Os *status* dos containers podem ser consultados:
 
 Via linha de comando:
 
@@ -503,45 +522,77 @@ docker ps -a
 
 Ou através do **Portainer**. Segue abaixo uma breve descrição de cada um desses *status*:
 
-- **starting**: Indica que o container foi iniciado (já consegue processar os jobs), mas ainda não ocorreu a verificação 
-das versões dos modelos. A primeira verificação ocorrerá, aproximadamente, 12 minutos após o início do container.
+- **starting**: Indica que o container foi iniciado (já consegue prover a aplicação), mas ainda não ocorreu a verificação 
+do container (*health check*).
 
 ![Starting](docs/container_starting.png)
 
-- **healthy**: O container foi iniciado e todos os modelos estão na sua versão mais atual. Este *status* será o padrão 
-enquanto o container estiver rodando e os modelos estiverem atualizados.
+- **healthy**: O container foi iniciado e está rodando corretamente. Este *status* será o padrão 
+enquanto o container estiver rodando sem problemas.
 
 ![Healthy](docs/container_healthy.png)
 
-- **unhealthy**: Indica que o container **Worker PUB** está rodando com um ou mais modelos desatualizados e precisa ser 
-reiniciado para carregar os modelos atualizados.
+- **unhealthy**: Indica que o container está rodando com um ou mais problemas e precisa ser reiniciado 
+para tentar se recuperar da situação problemática.
 
 ![Unhealthy](docs/container_unhealthy.png)
+
+### 5.4.2. Verificar o motivo dos *status* unhealthy.
+
 
 Para verificar o motivo do *status* estar na condição **unhealthy**:
 
 Via linha de comando:
 
+Substitua **nome_do_container** por um nome listado na coluna **'Nome do container'** da tabela no início do passo **5.4**.
+
 ```bash
-docker inspect stack-worker-pub-1
+docker inspect nome_do_container
 ```
 
 Para obter os detalhes que levaram a este *status* **unhealthy**, procure na saida do comando acima pela chave **"Health": {**.
 
-Utilizando o Portainer:
+Ou, utilizando o **Portainer**:
 
 Clique no nome do container, conforme destacado em verde na figura anterior, e procure a seção '**Container health**'; 
 na caixa '**Last output**', verifique a mensagem que informa o motivo do *status* está como **unhealthy**.
 
 ![Status_health_check](docs/container_status_health_check.png)
 
-Caso o **Worker PUB** esteja com *status* **unhealthy**, rode o comando abaixo para reiniciar o container e carregar a 
-versão mais atual dos modelos:
+### 5.4.3. Reiniciar os containers.
+
+Caso o container esteja com *status* **unhealthy**, rode o comando abaixo para reiniciá-lo e tentar recuperar o *status* 
+para **healthy**.
+
+**NOTA:** Este comando deve ser executado de dentro da pasta **prodest-ml-stack/stack/**. Utilize o nome que consta na 
+coluna **'Nome do serviço'** da tabela no início do passo **5.4**.
+```bash
+./docker-compose restart nome_do_serviço
+```
+
+**ATENÇÃO:** Se o container voltar a ficar com o *status* **unhealthy**, verifique os logs com o comando abaixo e tente 
+identificar o motivo da falha. Após a correção da falha, reinicie o container problemático novamente, conforme comando anterior.
+
+```bash
+./docker-compose logs nome_do_serviço
+```
+
+### 5.4.4. Serviço autoheal.
+
+Está presente na Stack um serviço chamado **autoheal** que roda o container **stack-autoheal-1**. Este serviço monitora os 
+*status* dos containers e, caso estejam **unhealthy**, os reinicia automaticamente para tentar recuperá-los para o *status* 
+**healthy**.
+
+![Altoheal](docs/container_autoheal.png)
+
+Se você preferir desabilitar o reinício automatizado dos containers, rode o comando abaixo para parar o serviço **autoheal**. 
 
 **NOTA:** Este comando deve ser executado de dentro da pasta **prodest-ml-stack/stack/**.
 ```bash
-./docker-compose restart worker-pub
+./docker-compose stop autoheal
 ```
+
+Se quiser subir o serviço **autoheal** novamente, troque **stop** por **start** no comando acima.
 
 ## 6. Links para acessar alguns componentes da Stack
 
