@@ -40,76 +40,107 @@ LOGGER = make_log()
 
 LOGGER.info("[*] ------------ Iniciando a API ------------")
 
+
+def gerar_arquivo_erro():
+    """
+    Gera um arquivo para indicar que aconteceu um erro. Esse arquivo será utilizado no healthy check do container.
+    """
+    caminho_arq_erro = "/tmp/error_8EDo2OWK9Sd7A4aN0uni.err"
+
+    try:
+        arq = open(caminho_arq_erro, 'w')
+    except PermissionError:
+        LOGGER.error(f"Não foi possível gerar o arquivo 'error_8EDo2OWK9Sd7A4aN0uni.err', para indicar um erro no "
+                     f"container, no caminho '/tmp'. Permissão de escrita negada.")
+        exit(1)
+
+    arq.write("Erro. Verifique os logs da aplicação para mais detalhes!\n")
+    arq.close()
+
+
 RABBITMQ_SERVER = env.get('RABBITMQ_SERVER')
 if not RABBITMQ_SERVER:
     LOGGER.error("Não foi possível obter a variável de ambiente 'RABBITMQ_SERVER'")
+    gerar_arquivo_erro()
     exit(1)
 
 RABBITMQ_PORT = env.get('RABBITMQ_PORT')
 if not RABBITMQ_PORT:
     LOGGER.error("Não foi possível obter a variável de ambiente 'RABBITMQ_PORT'")
+    gerar_arquivo_erro()
     exit(1)
 
 try:
     RABBITMQ_PORT = int(RABBITMQ_PORT)
 except ValueError:
     LOGGER.error("Informe uma porta TCP/IP válida na variável de ambiente 'RABBITMQ_PORT'")
+    gerar_arquivo_erro()
     exit(1)
 
 DB_SERVER_NAME = env.get('DB_SERVER_NAME')
 if not DB_SERVER_NAME:
     LOGGER.error("Não foi possível obter a variável de ambiente 'DB_SERVER_NAME'")
+    gerar_arquivo_erro()
     exit(1)
 
 STK_VERSION = env.get('STACK_VERSION')
 if not STK_VERSION:
     LOGGER.error("Não foi possível obter a variável de ambiente 'STACK_VERSION'")
+    gerar_arquivo_erro()
     exit(1)
 
 # Obtém o nome da base de dados para autenticação do usuário
 DB_AUTH_SOURCE = env.get("DB_AUTH_SOURCE")
 if not DB_AUTH_SOURCE:
     LOGGER.error("Não foi possível obter a variável de ambiente 'DB_AUTH_SOURCE'")
+    gerar_arquivo_erro()
     exit(1)
 
 # Obtém as credenciais para acesso ao banco de dados
 DB_USERNAME = env.get("MONGO_INITDB_ROOT_USERNAME")
 if not DB_USERNAME:
     LOGGER.error("Não foi possível obter a variável de ambiente 'MONGO_INITDB_ROOT_USERNAME'")
+    gerar_arquivo_erro()
     exit(1)
 
 DB_PASSWORD = env.get("MONGO_INITDB_ROOT_PASSWORD")
 if not DB_PASSWORD:
     LOGGER.error("Não foi possível obter a variável de ambiente 'MONGO_INITDB_ROOT_PASSWORD'")
+    gerar_arquivo_erro()
     exit(1)
 
 # Obtém as credenciais para interagir com a fila
 RABITMQ_USER = env.get("RABBITMQ_DEFAULT_USER")
 if not RABITMQ_USER:
     LOGGER.error("Não foi possível obter a variável de ambiente 'RABBITMQ_DEFAULT_USER'")
+    gerar_arquivo_erro()
     exit(1)
 
 RABITMQ_PASS = env.get("RABBITMQ_DEFAULT_PASS")
 if not RABITMQ_PASS:
     LOGGER.error("Não foi possível obter a variável de ambiente 'RABBITMQ_DEFAULT_PASS'")
+    gerar_arquivo_erro()
     exit(1)
 
 # Obtém o token para utilizar nesta instância da API
 TOKEN = env.get("API_TOKEN")
 if not TOKEN:
     LOGGER.error("Não foi possível obter a variável de ambiente 'API_TOKEN'")
+    gerar_arquivo_erro()
     exit(1)
 
 # Obtém a credencial utilizada pelos workers para informarem os seus 'work_id' para validação no cadastro das filas
 ADVWORKID_CRED = env.get("ADVWORKID_CREDENTIAL")
 if not ADVWORKID_CRED:
     LOGGER.error("Não foi possível obter a variável de ambiente 'ADVWORKID_CREDENTIAL'")
+    gerar_arquivo_erro()
     exit(1)
 
 # Obtém o token que será utilizado pelos workers para interagirem com os endpoints internos da API (/retorno, etc.)
 TOKEN_WORKERS = env.get("API_TOKEN_WORKERS")
 if not TOKEN_WORKERS:
     LOGGER.error("Não foi possível obter a variável de ambiente 'API_TOKEN_WORKERS'")
+    gerar_arquivo_erro()
     exit(1)
 
 
@@ -126,9 +157,11 @@ def connect_db(database_name: str):
         client.admin.command('ping')
     except ConnectionFailure as e:
         LOGGER.error(f"Servidor de banco de dados indisponível: {e.__class__} - {e}")
+        gerar_arquivo_erro()
         exit(1)
     except OperationFailure as e:
         LOGGER.error(f"Falha ao conectar no servidor de banco de dados: {e.__class__} - {e}")
+        gerar_arquivo_erro()
         exit(1)
 
     # Cria alguns índices para a coleção 'col_jobs'. Caso os índices já existam, não faz nada
@@ -141,6 +174,7 @@ def connect_db(database_name: str):
                          name="idx_getfeedback")
     except BaseException as e:
         LOGGER.error(f"Falha ao tentar criar índices para a coleção 'col_jobs': {e.__class__} - {e}")
+        gerar_arquivo_erro()
         exit(1)
 
     # Define e retorna a conexão com o banco de dados
@@ -163,6 +197,7 @@ def get_queue_registry_startup():
         result = col.find_one({'_id': obj_id})
     except BaseException as e:
         LOGGER.error(f"Falha ao buscar o registro de filas. Mensagem: {e.__class__} - {e}")
+        gerar_arquivo_erro()
         exit(1)
 
     if not result:
@@ -172,6 +207,7 @@ def get_queue_registry_startup():
             col.insert_one(result)
         except BaseException as e:
             LOGGER.error(f"Não foi possível criar o registro de filas. Mensagem: {e.__class__} - {e}")
+            gerar_arquivo_erro()
             exit(1)
 
     return result['queue_registry']
@@ -212,6 +248,7 @@ def enfileirar_job(queue_name, model_name, info_client_host, req_info) -> dict:
         msg = "Não foi possível enviar o job para a fila. Falha ao tentar conectar no servidor de filas"
         LOGGER.error(f"Origem da requisição: IP={info_client_host}. {msg}. Fila: '{queue_name}'. Modelo: "
                      f"'{model_name}': {e.__class__} - {e}")
+        gerar_arquivo_erro()
         return {'job_id': "n/a", 'status': "Error", 'response': msg}
 
     return {'status': "Done", 'response': ""}
@@ -228,6 +265,7 @@ def insert_doc(colecao, doc):
         col = CLIENT_BD[colecao]  # Indica a coleção onde os dados serão gravados no banco setado anteriormente
         result = col.insert_one(doc)
     except BaseException as e:
+        gerar_arquivo_erro()
         raise e
 
     return result
@@ -245,6 +283,7 @@ def retrieve_doc(colecao, chave, valor):
         col = CLIENT_BD[colecao]
         result = col.find_one({chave: valor})
     except BaseException as e:
+        gerar_arquivo_erro()
         raise e
 
     return result
@@ -310,6 +349,7 @@ def retrieve_docs_feedback(colecao, nome_modelo, initial_date, end_date) -> dict
     try:
         total_jobs_has_feedback = col.count_documents(filter=query_jobs_feedback, hint="idx_getfeedback")
     except BaseException as e:
+        gerar_arquivo_erro()
         raise e
 
     if total_jobs_has_feedback == 0:
@@ -335,6 +375,7 @@ def retrieve_docs_feedback(colecao, nome_modelo, initial_date, end_date) -> dict
             # Traz na ordem decrescente do campo 'datetime' e limita caso no intervalo de 1 dia existam muitos jobs
             resultado['docs'] = col.find(query_jobs_feedback, hint="idx_getfeedback").sort("datetime", -1).limit(30000)
         except BaseException as e:
+            gerar_arquivo_erro()
             raise e
     else:
         resultado['status'] = "Error"
@@ -363,6 +404,7 @@ def update_doc(colecao, chave_buscar, valor_buscar, chaves_alterar: dict):
         col = CLIENT_BD[colecao]
         result = col.update_one({chave_buscar: valor_buscar}, {'$set': chaves_alterar})
     except BaseException as e:
+        gerar_arquivo_erro()
         raise e
 
     return result
@@ -430,10 +472,12 @@ def save_queue_registry(queue_registry: dict) -> dict:
         if r.modified_count == 0:
             msg = "O registro de filas não foi encontrado"
             LOGGER.error(msg)
+            gerar_arquivo_erro()
             return {'status': "Error", 'response': msg}
     except BaseException as e:
         msg = f"Não foi possível salvar o registro de filas: {e.__class__} - {e}"
         LOGGER.error(msg)
+        gerar_arquivo_erro()
         return {'status': "Error", 'response': msg}
 
     return {'status': "Done", 'response': ""}  # Se chegou até aqui, é porque conseguiu salvar

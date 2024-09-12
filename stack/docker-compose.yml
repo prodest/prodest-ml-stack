@@ -3,7 +3,7 @@ version: '3.8'
 x-stack-common:
   &stack-common-env
   TZ : America/Sao_Paulo
-  no_proxy : "localhost, 127.0.0.1, 10.0.0.0/8, 172.16.0.0/12, database, api, queue, worker-pub, worker-retrain, model-registry, storage, mltraining-model"
+  no_proxy : "localhost, 127.0.0.1, 10.0.0.0/8, 172.16.0.0/12, database, api, queue, worker-pub, worker-retrain, model-registry, storage, mltraining-model, autoheal"
 
 # Variáveis comuns aos Workers e Model Registry
 x-common-variables:
@@ -40,6 +40,12 @@ services:
             delay: 30s
             max_attempts: 5
             window: 60s
+    healthcheck:  # Inspirado em: https://gist.github.com/maitrungduc1410/f2f7b34d2e736912471b006c6dba17e5
+        test: echo 'db.runCommand("ping").ok' | mongosh mongodb://localhost:27017/test --quiet
+        interval: 600s
+        timeout: 120s
+        retries: 1
+        start_period: 120s
 
   queue:
     # https://hub.docker.com/_/rabbitmq
@@ -61,6 +67,12 @@ services:
             delay: 30s
             max_attempts: 5
             window: 60s
+    healthcheck:  # Conforme: https://www.rabbitmq.com/docs/monitoring#health-checks
+        test: rabbitmq-diagnostics -q ping || exit 1
+        interval: 300s
+        timeout: 60s
+        retries: 1
+        start_period: 60s
 
   storage:
     # https://hub.docker.com/r/minio/minio
@@ -85,6 +97,12 @@ services:
             delay: 30s
             max_attempts: 5
             window: 60s
+    healthcheck:  # Conforme: https://min.io/docs/minio/linux/operations/monitoring/healthcheck-probe.html
+        test: curl -I http://localhost:9000/minio/health/cluster || exit 1
+        interval: 600s
+        timeout: 120s
+        retries: 1
+        start_period: 120s
 
   api:
     image: python-api
@@ -116,6 +134,12 @@ services:
     depends_on:
         - database
         - queue
+    healthcheck:
+        test: python /data/health_check_ce908c7e45a23.py
+        interval: 300s
+        timeout: 60s
+        retries: 1
+        start_period: 60s
 
   model-registry:
     image: python-mlflow
@@ -140,6 +164,15 @@ services:
             window: 60s
     depends_on:
         - storage
+    healthcheck:
+        # Conforme: https://www.restack.io/docs/mlflow-knowledge-mlflow-health-check-guide
+        # O endpoint health foi implementado somente na versão OSS do MLflow: https://github.com/mlflow/mlflow/pull/2725
+        # Motivo: https://github.com/mlflow/mlflow/issues/2504
+        test: curl --fail http://localhost:5000/health || exit 1
+        interval: 600s
+        timeout: 120s
+        retries: 1
+        start_period: 120s
 
   worker-pub:
     image: python-worker
@@ -165,6 +198,7 @@ services:
     depends_on:
         - model-registry
         - api
+        - queue
     healthcheck:
         test: python /worker_pub/health_check_77zvyn8tefzal7jg.py
         interval: 600s
@@ -191,3 +225,18 @@ services:
     command: sleep infinity
     depends_on:
         - model-registry
+
+  autoheal:
+    # Monitora e reinicia contairners que estão 'unhealthy' -> https://hub.docker.com/r/willfarrell/autoheal
+    restart: always
+    image: willfarrell/autoheal:latest  # Deixe sempre baixar a versão latest
+    environment:
+      AUTOHEAL_CONTAINER_LABEL : all
+      AUTOHEAL_INTERVAL : 90
+    deploy:
+        resources:
+            limits:
+              cpus: "0.2"
+              memory: 15M
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

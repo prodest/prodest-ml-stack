@@ -20,7 +20,8 @@ from fastapi.security import APIKeyHeader
 from pydantic import BaseModel
 from utils import ObjectId, TOKEN, STK_VERSION, LOGGER, CLIENT_BD, ADVWORKID_CRED, TOKEN_WORKERS, enfileirar_job, \
     generate_hash, insert_doc, validate_request, retrieve_doc, update_doc, save_queue_registry, \
-    get_queue_registry_startup, retrieve_docs_feedback, validate_params
+    get_queue_registry_startup, retrieve_docs_feedback, validate_params, gerar_arquivo_erro
+
 
 # Obtém o registro das filas no início da API
 QUEUE_REG = get_queue_registry_startup()
@@ -46,8 +47,12 @@ def reload_queue_registry():
         if result:
             QUEUE_REG = result['queue_registry']
             LOGGER.info("Reload do QUEUE registry -> OK")
+        else:
+            LOGGER.error("O registro de filas não foi encontrado!")
+            gerar_arquivo_erro()
     except BaseException as e:
         LOGGER.error(f"Falha ao buscar o registro de filas. Mensagem: {e.__class__} - {e}")
+        gerar_arquivo_erro()
 
 
 # Informações adicionais para geração de documentação automática da API via Swagger.
@@ -264,6 +269,7 @@ async def inference(cr: Annotated[
         except BaseException as e:
             LOGGER.error(f"Origem da requisição: IP={info.client.host}. Erro reportado: Não foi possível gerar o "
                          f"job. Erro na conexão com o banco de dados: {e.__class__} - {e}")
+            gerar_arquivo_erro()
             return {'job_id': "n/a", 'model_name': model_name, 'method': method, 'status': "Error",
                     'response': "Não foi possível gerar o job. Erro na conexão com o banco de dados"}
 
@@ -349,6 +355,7 @@ async def get_status(cr: Annotated[
     except BaseException as e:
         msg = f"Não foi possível obter o status do job {job_id}. Erro na conexão com o banco de dados"
         LOGGER.error(f"Origem da requisição: IP={info.client.host}. Erro reportado: {msg}: {e.__class__} - {e}")
+        gerar_arquivo_erro()
         return {'status': "Error", 'response': msg}
 
 
@@ -425,6 +432,7 @@ async def feedback(cr: Annotated[
     except BaseException as e:
         msg = f"Não foi possível informar o feedback para o job {job_id}. Erro na conexão com o banco de dados"
         LOGGER.error(f"Origem da requisição: IP={info.client.host}. Erro reportado: {msg}: {e.__class__} - {e}")
+        gerar_arquivo_erro()
         return {'status': "Error", 'response': msg}
 
 
@@ -494,6 +502,7 @@ async def get_feedback(cr: Annotated[
             msg = f"Erro ao tentar obter os jobs para realizar o feedback do modelo {model_name}. Falha na conexão " \
                   f"com o banco de dados"
             LOGGER.error(f"Origem da requisição: IP={info.client.host}. Erro reportado: {msg}: {e.__class__} - {e}")
+            gerar_arquivo_erro()
             return {'job_id': "n/a", 'model_name': model_name, 'method': "get_feedback", 'status': "Error",
                     'response': msg}
 
@@ -598,6 +607,7 @@ async def get_feedback(cr: Annotated[
         except BaseException as e:
             msg = "Não foi possível gerar o job. Erro na conexão com o banco de dados"
             LOGGER.error(f"Origem da requisição: IP={info.client.host}. Erro reportado: {msg}: {e.__class__} - {e}")
+            gerar_arquivo_erro()
             return {'job_id': "n/a", 'model_name': model_name, 'method': "get_feedback", 'status': "Error",
                     'response': msg}
 
@@ -634,6 +644,7 @@ async def attstatus(info: Request, authorization: Optional[str] = Header(None, i
     except BaseException as e:
         msg = f"Não foi possível atualizar o status do job {job_id}. Erro na conexão com o banco de dados"
         LOGGER.error(f"{msg}: {e.__class__} - {e}")
+        gerar_arquivo_erro()
         return {'status': "Error", 'response': msg}
 
 
@@ -665,6 +676,7 @@ async def retorno(info: Request, authorization: Optional[str] = Header(None, inc
         msg = f"Não foi possível salvar o retorno dos dados e atualizar o status do job {job_id}. Falha na conexão " \
               f"com o banco de dados: {e.__class__} - {e}"
         LOGGER.error(msg)
+        gerar_arquivo_erro()
         return {'status': "Error", 'response': f"{msg}"}
 
 
