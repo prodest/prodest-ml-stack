@@ -346,14 +346,15 @@ Por exemplo, para o pacote rich:
 
 As versões atualizadas dos pacotes devem ser extraídas dos arquivos gerados, conforme correspondência na tabela abaixo:
 
-| Componente  | Arquivo para atualizar| Arquivo com as versões novas|
-| ------------- | ------------- | --------------------------------- |
-| API  | Dockerfile | req_api.txt |
-| Model Registry  | Dockerfile | req_model_reg.txt |
-| Worker Training  | requirements.txt | req_worker_train.txt |
-| Worker PUB  | requirements.txt | req_worker_pub.txt |
-| Worker Retrain  | requirements.txt | req_worker_retrain.txt |
-| mllibprodest  | pyproject.toml | req_mllib.txt |
+| Componente                     | Arquivo para atualizar| Arquivo com as versões novas|
+|--------------------------------| ------------- | --------------------------------- |
+| API (Stack)                    | Dockerfile | req_api.txt |
+| Model Registry (Stack)         | Dockerfile | req_model_reg.txt |
+| Worker PUB (Stack)             | Dockerfile | req_worker_pub.txt |
+| Worker Training (modelo-teste) | requirements.txt | req_worker_train.txt |
+| Worker PUB (modelo-teste)      | requirements.txt | req_worker_pub.txt |
+| Worker Retrain (modelo-teste)  | requirements.txt | req_worker_retrain.txt |
+| mllibprodest                   | pyproject.toml | req_mllib.txt |
 
 **ATENÇÃO**:
 
