@@ -277,7 +277,9 @@ def do_work(ch, delivery_tag, body):
                     model_version = model_version_wref()
                     tipo_retorno_model_version = type(model_version.get_obj())
 
-                    if tipo_retorno_model_version is not str:
+                    if tipo_retorno_model_version is str:
+                        retorno.get_obj()['model_version'] = model_version.get_obj()
+                    else:
                         tipo_retorno_ok = False
                         del retorno_modelo, model_version
                         retorno.get_obj()['model_version'] = ""  # Para não dar erro de chave não encontrada na API
@@ -288,7 +290,6 @@ def do_work(ch, delivery_tag, body):
                         # Se o tipo do retorno do modelo for 'str' significa de aconteceu algum erro
                         if tipo_retorno is not str:
                             retorno.get_obj()['status'] = "Done"
-                            retorno.get_obj()['model_version'] = model_version.get_obj()
 
                             # Inclui as informações adicionais sobre o feedback vindas da API
                             if metodo == "get_feedback":
@@ -306,7 +307,7 @@ def do_work(ch, delivery_tag, body):
                     # Expondo exceção que está vindo do modelo para o cliente, para facilitar o diagnóstico da falha
                     msg = f"O modelo '{model_name}' reportou o seguinte erro ao tentar processar o job: " \
                           f"{e.__class__} - {e}"
-                    retorno_obj = WeakObj({'job_id': job_id, 'status': "Error",
+                    retorno_obj = WeakObj({'job_id': job_id, 'status': "Error", 'model_version': "",
                                            'queue_response_time_sec': queue_response_time_sec, 'response': msg})
                     retorno_wref = weakref.ref(retorno_obj)
                     retorno = retorno_wref()
@@ -314,7 +315,7 @@ def do_work(ch, delivery_tag, body):
             else:
                 retorno_obj = WeakObj({'job_id': job_id, 'status': "Error", 'response': f"O modelo '{model_name}' não "
                                                                                         f"foi encontrado!",
-                                       'queue_response_time_sec': queue_response_time_sec})
+                                       'queue_response_time_sec': queue_response_time_sec, 'model_version': ""})
                 retorno_wref = weakref.ref(retorno_obj)
                 retorno = retorno_wref()
                 LOGGER.error(f"{retorno.get_obj()}")
