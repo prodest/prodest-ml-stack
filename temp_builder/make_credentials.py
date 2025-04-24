@@ -116,6 +116,10 @@ if __name__ == "__main__":
     mlflow_admin_password = generate_password()
     arq_cred.write(f"# Model Registry (MLFLOW):\nadmin_username={mlflow_admin_username}\n"
                    f"admin_password={mlflow_admin_password}\n\n")
+    
+    # Secret Key do Flask (framework usado pelo MLFlow)
+    secret_key_flask = generate_password()
+    arq_cred.write(f"# Secret Key do Flask (framework usado pelo MLFlow):\nsecret_key_flask={secret_key_flask}\n\n")
 
     # Acesso Minio
     arq_cred.write(f"# ACESSO STORAGE (MINIO) (Obs.: São as mesmas do usuário admin. Se preferir, pode criar outras "

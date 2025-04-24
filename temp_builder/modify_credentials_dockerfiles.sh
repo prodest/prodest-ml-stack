@@ -49,6 +49,7 @@ source credentials_stack.txt
 echo "- Gerando as credenciais no arquivo '../stack/.env'..." >> log_tempbuilder.txt
 echo "MLFLOW_TRACKING_USERNAME=$admin_username" > ../stack/.env
 echo "MLFLOW_TRACKING_PASSWORD=$admin_password" >> ../stack/.env
+echo "MLFLOW_FLASK_SERVER_SECRET_KEY=$secret_key_flask" >> ../stack/.env
 echo "ADVWORKID_CREDENTIAL=$advworkid_credential" >> ../stack/.env
 echo "WORKER_ID_001=$worker_id_001" >> ../stack/.env
 echo "API_TOKEN=$api_token" >> ../stack/.env

@@ -1,5 +1,5 @@
 # Template baseado em https://hub.docker.com/_/python/
-FROM python:3.10
+FROM python:3.11
 
 RUN useradd -m pubuser && mkdir /worker_pub
 
