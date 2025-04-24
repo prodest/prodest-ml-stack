@@ -1,145 +1,141 @@
-version: '3.8'
+version: "3.8"
 
-x-stack-common:
-  &stack-common-env
-  TZ : America/Sao_Paulo
-  no_proxy : "localhost, 127.0.0.1, 10.0.0.0/8, 172.16.0.0/12, database, api, queue, worker-pub, worker-retrain, model-registry, storage, mltraining-model, autoheal"
+x-stack-common: &stack-common-env
+  TZ: America/Sao_Paulo
+  no_proxy: "localhost, 127.0.0.1, 10.0.0.0/8, 172.16.0.0/12, database, api, queue, worker-pub, worker-retrain, model-registry, storage, mltraining-model, autoheal"
 
 # Variáveis comuns aos Workers e Model Registry
-x-common-variables:
-  &common-variables
-  STACK_LOG_OUTPUT: file  # Local para geração de logs. Opções: file ou console
-  MLFLOW_S3_ENDPOINT_URL : http://storage:9000/
-  MLFLOW_TRACKING_URI : http://model-registry:5000/
-  MLFLOW_TRACKING_USERNAME : ${MLFLOW_TRACKING_USERNAME}
-  MLFLOW_TRACKING_PASSWORD : ${MLFLOW_TRACKING_PASSWORD}
-  AWS_ACCESS_KEY_ID : ${AWS_ACCESS_KEY_ID}
-  AWS_SECRET_ACCESS_KEY : ${AWS_SECRET_ACCESS_KEY}
-
+x-common-variables: &common-variables
+  STACK_LOG_OUTPUT: file # Local para geração de logs. Opções: file ou console
+  MLFLOW_S3_ENDPOINT_URL: http://storage:9000/
+  MLFLOW_TRACKING_URI: http://model-registry:5000/
+  MLFLOW_TRACKING_USERNAME: ${MLFLOW_TRACKING_USERNAME}
+  MLFLOW_TRACKING_PASSWORD: ${MLFLOW_TRACKING_PASSWORD}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
 
 services:
-
   database:
     # https://hub.docker.com/_/mongo
-    image: mongo:7.0.14-jammy
+    image: mongo:8.0.8-noble
     environment:
       <<: *stack-common-env
-      MONGO_INITDB_ROOT_USERNAME : ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD : ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - ../database/mongodb_data:/data/db
     ports:
       - "27017:27017"
     deploy:
-        resources:
-            limits:
-              cpus: "0.5"
-              memory: 550M
-        restart_policy:
-            condition: on-failure
-            delay: 30s
-            max_attempts: 5
-            window: 60s
-    healthcheck:  # Inspirado em: https://gist.github.com/maitrungduc1410/f2f7b34d2e736912471b006c6dba17e5
-        test: echo 'db.runCommand("ping").ok' | mongosh mongodb://localhost:27017/test --quiet
-        interval: 600s
-        timeout: 120s
-        retries: 1
-        start_period: 120s
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 550M
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+        window: 60s
+    healthcheck: # Inspirado em: https://gist.github.com/maitrungduc1410/f2f7b34d2e736912471b006c6dba17e5
+      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://localhost:27017/test --quiet
+      interval: 600s
+      timeout: 120s
+      retries: 1
+      start_period: 120s
 
   queue:
     # https://hub.docker.com/_/rabbitmq
-    image: rabbitmq:4.0.2-management
+    image: rabbitmq:4.0.9-management-alpine
     environment:
       <<: *stack-common-env
-      RABBITMQ_DEFAULT_USER : ${RABBITMQ_DEFAULT_USER}
-      RABBITMQ_DEFAULT_PASS : ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     ports:
       - "15672:15672"
       - "5672:5672"
     deploy:
-        resources:
-            limits:
-              cpus: "0.3"
-              memory: 250M
-        restart_policy:
-            condition: on-failure
-            delay: 30s
-            max_attempts: 5
-            window: 60s
-    healthcheck:  # Conforme: https://www.rabbitmq.com/docs/monitoring#health-checks
-        test: rabbitmq-diagnostics -q ping || exit 1
-        interval: 300s
-        timeout: 60s
-        retries: 1
-        start_period: 60s
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: 250M
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+        window: 60s
+    healthcheck: # Conforme: https://www.rabbitmq.com/docs/monitoring#health-checks
+      test: rabbitmq-diagnostics -q ping || exit 1
+      interval: 300s
+      timeout: 60s
+      retries: 1
+      start_period: 60s
 
   storage:
     # https://hub.docker.com/r/minio/minio
-    image: minio/minio:RELEASE.2024-10-02T17-50-41Z
+    image: minio/minio:RELEASE.2025-04-08T15-41-24Z
     volumes:
       - ../storage/minio_data:/data
     environment:
       <<: *stack-common-env
-      MINIO_ROOT_USER : ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD : ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server /data --console-address :9001
     ports:
       - "9000:9000"
       - "9001:9001"
     deploy:
-        resources:
-            limits:
-              cpus: "0.2"
-              memory: 180M
-        restart_policy:
-            condition: on-failure
-            delay: 30s
-            max_attempts: 5
-            window: 60s
-    healthcheck:  # Conforme: https://min.io/docs/minio/linux/operations/monitoring/healthcheck-probe.html
-        test: curl -I http://localhost:9000/minio/health/cluster || exit 1
-        interval: 600s
-        timeout: 120s
-        retries: 1
-        start_period: 120s
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 180M
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+        window: 60s
+    healthcheck: # Conforme: https://min.io/docs/minio/linux/operations/monitoring/healthcheck-probe.html
+      test: curl -I http://localhost:9000/minio/health/cluster || exit 1
+      interval: 600s
+      timeout: 120s
+      retries: 1
+      start_period: 120s
 
   api:
     image: python-api
     environment:
       <<: *stack-common-env
-      RABBITMQ_SERVER : queue
-      RABBITMQ_PORT : "5672"
-      DB_SERVER_NAME : database
-      DB_AUTH_SOURCE : admin
-      ADVWORKID_CREDENTIAL : ${ADVWORKID_CREDENTIAL}
-      API_TOKEN : ${API_TOKEN}
-      API_TOKEN_WORKERS : ${API_TOKEN_WORKERS}
-      RABBITMQ_DEFAULT_USER : ${RABBITMQ_DEFAULT_USER}
-      RABBITMQ_DEFAULT_PASS : ${RABBITMQ_DEFAULT_PASS}
-      MONGO_INITDB_ROOT_USERNAME : ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD : ${MONGO_INITDB_ROOT_PASSWORD}
+      RABBITMQ_SERVER: queue
+      RABBITMQ_PORT: "5672"
+      DB_SERVER_NAME: database
+      DB_AUTH_SOURCE: admin
+      ADVWORKID_CREDENTIAL: ${ADVWORKID_CREDENTIAL}
+      API_TOKEN: ${API_TOKEN}
+      API_TOKEN_WORKERS: ${API_TOKEN_WORKERS}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - "8080:8000"
     deploy:
-        resources:
-            limits:
-              cpus: "0.6"
-              memory: 200M
-        restart_policy:
-            condition: on-failure
-            delay: 30s
-            max_attempts: 10
-            window: 60s
+      resources:
+        limits:
+          cpus: "0.6"
+          memory: 200M
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 10
+        window: 60s
     depends_on:
-        - database
-        - queue
+      - database
+      - queue
     healthcheck:
-        test: python /data/health_check_ce908c7e45a23.py
-        interval: 300s
-        timeout: 60s
-        retries: 1
-        start_period: 60s
+      test: python /data/health_check_ce908c7e45a23.py
+      interval: 300s
+      timeout: 60s
+      retries: 1
+      start_period: 60s
 
   model-registry:
     image: python-mlflow
@@ -147,64 +143,65 @@ services:
       <<: [*stack-common-env, *common-variables]
       # Nome do bucket padrão onde o MLflow irá salvar os artefatos dos experimentos. Caso deseje alterar,
       # troque mlflow pelo nome do bucket que desejar
-      DEFAULT_ARTIFACT_ROOT : s3://mlflow/artefatos
+      DEFAULT_ARTIFACT_ROOT: s3://mlflow/artefatos
+      MLFLOW_FLASK_SERVER_SECRET_KEY: ${MLFLOW_FLASK_SERVER_SECRET_KEY}
     volumes:
       - ../model_registry/mlflow_data:/mlflow_data
     ports:
       - "5000:5000"
     deploy:
-        resources:
-            limits:
-              cpus: "1.8"
-              memory: 800M
-        restart_policy:
-            condition: on-failure
-            delay: 30s
-            max_attempts: 5
-            window: 60s
+      resources:
+        limits:
+          cpus: "1.8"
+          memory: 800M
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 5
+        window: 60s
     depends_on:
-        - storage
+      - storage
     healthcheck:
-        # Conforme: https://www.restack.io/docs/mlflow-knowledge-mlflow-health-check-guide
-        # O endpoint health foi implementado somente na versão OSS do MLflow: https://github.com/mlflow/mlflow/pull/2725
-        # Motivo: https://github.com/mlflow/mlflow/issues/2504
-        test: curl --fail http://localhost:5000/health || exit 1
-        interval: 600s
-        timeout: 120s
-        retries: 1
-        start_period: 120s
+      # Conforme: https://www.restack.io/docs/mlflow-knowledge-mlflow-health-check-guide
+      # O endpoint health foi implementado somente na versão OSS do MLflow: https://github.com/mlflow/mlflow/pull/2725
+      # Motivo: https://github.com/mlflow/mlflow/issues/2504
+      test: curl --fail http://localhost:5000/health || exit 1
+      interval: 600s
+      timeout: 120s
+      retries: 1
+      start_period: 120s
 
   worker-pub:
     image: python-worker
     environment:
       <<: [*stack-common-env, *common-variables]
-      API_URL : http://api:8000
-      RABBITMQ_SERVER : queue
-      RABBITMQ_PORT : "5672"
-      RABBITMQ_DEFAULT_USER : ${RABBITMQ_DEFAULT_USER}
-      RABBITMQ_DEFAULT_PASS : ${RABBITMQ_DEFAULT_PASS}
-      ADVWORKID_CREDENTIAL : ${ADVWORKID_CREDENTIAL}
-      WORKER_ID_001 : ${WORKER_ID_001}
+      API_URL: http://api:8000
+      RABBITMQ_SERVER: queue
+      RABBITMQ_PORT: "5672"
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      ADVWORKID_CREDENTIAL: ${ADVWORKID_CREDENTIAL}
+      WORKER_ID_001: ${WORKER_ID_001}
     deploy:
-        resources:
-            limits:
-              cpus: "0.6"
-              memory: 600M
-        restart_policy:
-            condition: on-failure
-            delay: 45s
-            max_attempts: 10
-            window: 60s
+      resources:
+        limits:
+          cpus: "0.6"
+          memory: 600M
+      restart_policy:
+        condition: on-failure
+        delay: 45s
+        max_attempts: 10
+        window: 60s
     depends_on:
-        - model-registry
-        - api
-        - queue
+      - model-registry
+      - api
+      - queue
     healthcheck:
-        test: python /worker_pub/health_check_77zvyn8tefzal7jg.py
-        interval: 600s
-        timeout: 120s
-        retries: 1
-        start_period: 120s
+      test: python /worker_pub/health_check_77zvyn8tefzal7jg.py
+      interval: 600s
+      timeout: 120s
+      retries: 1
+      start_period: 120s
 
   worker-retrain:
     # A propriedade 'deploy' não foi configurada porque depende de cada modelo em específico.
@@ -214,7 +211,7 @@ services:
       <<: [*stack-common-env, *common-variables]
     command: sleep infinity
     depends_on:
-        - model-registry
+      - model-registry
 
   mltraining-model:
     # A propriedade 'deploy' não foi configurada porque depende de cada modelo em específico.
@@ -224,19 +221,19 @@ services:
       <<: [*stack-common-env, *common-variables]
     command: sleep infinity
     depends_on:
-        - model-registry
+      - model-registry
 
   autoheal:
     # Monitora e reinicia contairners que estão 'unhealthy' -> https://hub.docker.com/r/willfarrell/autoheal
     restart: always
-    image: willfarrell/autoheal:latest  # Deixe sempre baixar a versão latest
+    image: willfarrell/autoheal:latest # Deixe sempre baixar a versão latest
     environment:
-      AUTOHEAL_CONTAINER_LABEL : all
-      AUTOHEAL_INTERVAL : 90
+      AUTOHEAL_CONTAINER_LABEL: all
+      AUTOHEAL_INTERVAL: 90
     deploy:
-        resources:
-            limits:
-              cpus: "0.2"
-              memory: 15M
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 15M
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
