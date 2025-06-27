@@ -3,12 +3,15 @@
 # da Stack. Essas credenciais são gravadas em um arquivo chamado 'credentials_stack.txt' que é utilizado pelo script
 # 'modify_credentials_dockerfiles.sh' para modificar as credenciais.
 # --------------------------------------------------------------------------------------------------------------------
+import bcrypt
 from hashlib import sha256
 from time import time
 from numpy import random
-from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime
+
+# https://stackoverflow.com/questions/78628938/trapped-error-reading-bcrypt-version-v-4-1-2
+bcrypt.__about__ = bcrypt
 
 
 def generate_hash():
@@ -69,6 +72,7 @@ def generate_password():
 
 
 if __name__ == "__main__":
+    from passlib.context import CryptContext
     arq_cred = None
 
     # Gera as credenciais para o Compose File

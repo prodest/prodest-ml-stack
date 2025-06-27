@@ -1,3 +1,5 @@
+# check=skip=WorkdirRelativePath
+
 # Utilizado para gerar uma imagem para um container temporário que gera as credenciais usadas no build/deploy dos
 # containers da stack
 # https://hub.docker.com/_/python/
