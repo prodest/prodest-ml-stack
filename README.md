@@ -182,7 +182,7 @@ e altere o **'Stage'** para **'Production'**.
 ### 2.1. Registre o modelo treinado:
 
 - Acesse o MLflow (http://localhost:5000) e clique no experimento **CLF-Cyberbullying_Tweets**;
-- Clique no link para o experimento que está na coluna **'Run Name'**;
+- Clique no link para o experimento que está na coluna **'Models'**;
 - Clique no botão **'Register Model'** e escolha a opção **'Create New Model'**;
 - Dê o nome **CLF_CYBER_BULLYING_TWEETS** para o modelo e clique em **'Register'**;
 - Na barra superior clique em **'Models'**;
