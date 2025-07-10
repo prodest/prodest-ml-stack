@@ -501,7 +501,7 @@ as instruções abaixo para realizar um teste simples de _stress_.
 
 ```bash
 pip install --upgrade pip setuptools
-pip install requests==2.31.0
+pip install requests==2.32.4
 ```
 
 - Execute o script que fará o teste de _stress_; observe a execução e as mensagens na tela.

@@ -13,7 +13,7 @@ fi
 base_path=$(pwd)
 repo=https://github.com/prodest/modelo-teste.git
 docker_composer_name=docker-compose-linux-x86_64
-url_docker_compose=https://github.com/docker/compose/releases/download/v2.20.3/$docker_composer_name
+url_docker_compose=https://github.com/docker/compose/releases/download/v2.38.1/$docker_composer_name
 
 if [ ! -f "$base_path/stack/docker-compose" ]; then
     echo -e ">>> Baixando o Docker Compose...\n"

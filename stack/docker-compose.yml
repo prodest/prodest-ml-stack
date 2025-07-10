@@ -17,7 +17,7 @@ x-common-variables: &common-variables
 services:
   database:
     # https://hub.docker.com/_/mongo
-    image: mongo:8.0.8-noble
+    image: mongo:8.0.11-noble
     environment:
       <<: *stack-common-env
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
@@ -45,7 +45,7 @@ services:
 
   queue:
     # https://hub.docker.com/_/rabbitmq
-    image: rabbitmq:4.0.9-management-alpine
+    image: rabbitmq:4.1.2-management-alpine
     environment:
       <<: *stack-common-env
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
@@ -72,7 +72,7 @@ services:
 
   storage:
     # https://hub.docker.com/r/minio/minio
-    image: minio/minio:RELEASE.2025-04-08T15-41-24Z
+    image: minio/minio:RELEASE.2025-06-13T11-33-47Z
     volumes:
       - ../storage/minio_data:/data
     environment:
