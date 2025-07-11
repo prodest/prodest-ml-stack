@@ -62,12 +62,12 @@ def verificar_dados_modelos():
     Worker dever ser reiniciado.
     :return: 0, se os modelos possuem as mesmas versões; 1, caso contrário ou se acontecer algum erro.
     """
-    if not Path.exists(Path("/tmp/runid_models.pkl")):
-        LOGGER.error("O arquivo com as versões dos modelos não foi encontrado no caminho '/tmp/runid_models.pkl'")
+    if not Path.exists(Path("/tmp/MR-models_versions.pkl")):
+        LOGGER.error("O arquivo com as versões dos modelos não foi encontrado no caminho '/tmp/MR-models_versions.pkl'")
         return 1
 
     modelos_desatualizados = []
-    dados_modelos = convert_artifact_to_object(file_name="runid_models.pkl", path="/tmp")
+    dados_modelos = convert_artifact_to_object(file_name="MR-models_versions.pkl", path="/tmp")
 
     # Compara os run_ids dos modelos carregados pelo Worker com os modelos carregados para verificação e guarda os que
     # estão diferentes, ou seja, desatualizados
