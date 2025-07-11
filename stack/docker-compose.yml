@@ -28,7 +28,7 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: 550M
+          memory: 750M
       restart_policy:
         condition: on-failure
         delay: 30s
@@ -84,8 +84,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.2"
-          memory: 180M
+          cpus: "0.6"
+          memory: 480M
       restart_policy:
         condition: on-failure
         delay: 30s
@@ -183,8 +183,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.6"
-          memory: 600M
+          cpus: "0.8"
+          memory: 800M
       restart_policy:
         condition: on-failure
         delay: 45s
