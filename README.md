@@ -176,8 +176,7 @@ nano configs.py
 
 Para sair do editor **nano**: Pressione **CTRL+x**; digite **y** e pressione **ENTER** para salvar as alterações.
 
-Após alterar a configuração, saia do container (exit); **rode novamente** o comando para realizar o treino; registre o novo modelo
-e altere o **'Stage'** para **'Production'**.
+Após alterar a configuração, saia do container (exit); **rode novamente** o comando para realizar o treino; registre o novo modelo e coloque em produção, conforme passo **2.1**.
 
 ### 2.1. Registre o modelo treinado:
 
