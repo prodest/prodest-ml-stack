@@ -21,6 +21,7 @@ from json import dumps
 from time import time
 from mllibprodest.utils import make_log
 from mllibprodest.initiators.model_initiator import InitModels as Im
+from mllibprodest.providers_types.utils import get_models_versions_providers
 from os import environ as env
 from pika.exchange_type import ExchangeType
 
@@ -354,20 +355,36 @@ def on_message(ch, method_frame, _header_frame, body, args):
 if __name__ == "__main__":
     LOGGER.info("[*] Iniciando o processamento da engine de ML...")
 
+    # Guarda a versão, definida pelo usuário, de cada modelo para auxiliar na verificação dos modelos que estão sendo utilizados pelo worker
+    models_ver_usuario = {}
+
+    for nome_modelo, modelo in MODELOS.items():
+        models_ver_usuario[nome_modelo] = modelo.get_model_version()
+
+    LOGGER.info(f"[*] Versões dos modelos definidas pelo usuário: {models_ver_usuario}")
+
     # Guarda as versões de cada modelo para auxiliar na realização de health check do container
     models_ver = {}
 
-    for nome_modelo, modelo in MODELOS.items():
-        models_ver[nome_modelo] = modelo.get_model_version()
+    LOGGER.info("[*] Obtendo as versões dos modelos de ML para realizar o health check do Worker...")
+    try:
+        models_ver = get_models_versions_providers()
+    except BaseException as e:
+        LOGGER.error(f"Não foi possível obter as versões dos modelos. Mensagem do 'get_models_versions_providers': "
+                    f"{e.__class__} - {e}",
+                    exc_info=True)
+        exit(1)
+    
+    LOGGER.info(f"[*] Versões dos modelos obtidas do Model Registry (serão utilizadas no health check do Worker): {models_ver}")
 
     # Obtém um modelo qualquer para utilizar o método 'convert_artifact_to_pickle' para auxiliar na persistência
     modelo_aux = MODELOS[list(MODELOS.keys())[0]]
 
-    modelo_aux.convert_artifact_to_pickle(model_name="", artifact=models_ver, file_name="runid_models.pkl", path="/tmp")
-    LOGGER.info("Arquivo de versões dos modelos, para realizar o health check do Worker, gerado com sucesso no caminho "
-                "'/tmp/runid_models.pkl'")
+    modelo_aux.convert_artifact_to_pickle(model_name="", artifact=models_ver, file_name="MR-models_versions.pkl", path="/tmp")
+    LOGGER.info("[*] Arquivo de versões dos modelos, para realizar o health check do Worker, gerado com sucesso no caminho "
+                "'/tmp/MR-models_versions.pkl'")
 
-    del models_ver, modelo_aux
+    del models_ver_usuario, models_ver, modelo_aux
 
     # Montando a requisição para informar o 'WORKER_ID' para a API
     url_advworkid = f"{API_URL}/advworkid"

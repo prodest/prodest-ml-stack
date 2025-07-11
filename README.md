@@ -176,8 +176,7 @@ nano configs.py
 
 Para sair do editor **nano**: Pressione **CTRL+x**; digite **y** e pressione **ENTER** para salvar as alterações.
 
-Após alterar a configuração, saia do container (exit); **rode novamente** o comando para realizar o treino; registre o novo modelo
-e altere o **'Stage'** para **'Production'**.
+Após alterar a configuração, saia do container (exit); **rode novamente** o comando para realizar o treino; registre o novo modelo e coloque em produção, conforme passo **2.1**.
 
 ### 2.1. Registre o modelo treinado:
 
@@ -501,7 +500,7 @@ as instruções abaixo para realizar um teste simples de _stress_.
 
 ```bash
 pip install --upgrade pip setuptools
-pip install requests==2.31.0
+pip install requests==2.32.4
 ```
 
 - Execute o script que fará o teste de _stress_; observe a execução e as mensagens na tela.
