@@ -1,5 +1,5 @@
 # Template baseado em https://hub.docker.com/_/python/
-FROM python:3.11
+FROM python:3.12
 
 RUN useradd -m retruser && mkdir /worker_retrain
 
