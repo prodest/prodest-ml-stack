@@ -184,7 +184,7 @@ Após alterar a configuração, saia do container (exit); **rode novamente** o c
 - Clique no link para o experimento que está na coluna **'Models'**;
 - Clique no botão **'Register Model'** e escolha a opção **'Create New Model'**;
 - Dê o nome **CLF_CYBER_BULLYING_TWEETS** para o modelo e clique em **'Register'**;
-- Na barra superior clique em **'Models'**;
+- Na barra lateral esquerda clique em **'Models'**;
 - Clique no link para a última versão do modelo que está em **'Latest Version'**;
 - Na opção **'Aliases'**, clique em **'Add'**;
 - Digite **_production_** e clique em **'Save aliases'**.
@@ -500,7 +500,7 @@ as instruções abaixo para realizar um teste simples de _stress_.
 
 ```bash
 pip install --upgrade pip setuptools
-pip install requests==2.32.4
+pip install requests==2.32.5
 ```
 
 - Execute o script que fará o teste de _stress_; observe a execução e as mensagens na tela.

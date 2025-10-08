@@ -113,11 +113,11 @@ Procure pelo arquivo **pyproject.toml** que está dentro da pasta criada no proc
 
 ![alt text](docs/pyproject_com_versoes.png)
 
-- Retire a versão do Setup tools da linha: **requires = ['setuptools>=69.1.1']** deve ficar assim: **requires = ['setuptools']**
+- Retire a versão do Setup tools da linha: **requires = ['setuptools>=80.9.0']** deve ficar assim: **requires = ['setuptools']**
 
 - Altere a versão da mllibprodest somando 1 no último campo numérico na linha: **version = "1.8.5"**, que nesse exemplo ficará assim: **version = "1.8.6"**
 
-- Retire as versões dos pacotes que constam na linha: **dependencies = ['minio==7.2.5', 'python-dotenv==1.0.1', ...]**. Deve ficar assim: **dependencies = ['minio', 'python-dotenv', ...]**
+- Retire as versões dos pacotes que constam na linha: **dependencies = ['minio==7.2.18', 'python-dotenv==1.1.1', ...]**. Deve ficar assim: **dependencies = ['minio', 'python-dotenv', ...]**
 
 Depois das alterações realizadas, o arquivo deverá ficar parecido com a imagem abaixo.
 
@@ -137,10 +137,10 @@ Crie uma pasta, com o nome que desejar, e copie a pasta criada no processo de cl
 
 Abra um _prompt_ de comando e entre na pasta criada no **passo 3.1**; depois entre na pasta do _fork_ do repositório da mllibprodest.
 
-Crie o ambiente virtual de acordo com a versão requerida pela lib (nesse exemplo é 3.11, veja na linha **requires-python = ">=3.11"** do arquivo **pyproject.toml**).
+Crie o ambiente virtual de acordo com a versão requerida pela lib (nesse exemplo é 3.12, veja na linha **requires-python = ">=3.12"** do arquivo **pyproject.toml**).
 
 ```bash
-python3.11 -m venv env
+python3.12 -m venv env
 ```
 
 Ative o ambiente virtual.
