@@ -417,7 +417,24 @@ if __name__ == "__main__":
                     passive=False,
                     durable=True,
                     auto_delete=False)
-                channel.queue_declare(queue=WORKER_ID, auto_delete=True)
+                #channel.queue_declare(queue=WORKER_ID, auto_delete=True)
+
+                # Configura argumentos da fila (TTL e expiração)
+                arguments = {
+                    'x-message-ttl': 90000,   # mensagens expiram após 90s
+                    'x-expires': 1000        # fila some se não houver consumidores por 1s
+                }
+
+                # Declara a fila do worker
+                channel.queue_declare(
+                    queue=WORKER_ID,
+                    durable=True,
+                    exclusive=False,
+                    auto_delete=False,
+                    arguments=arguments
+                )
+
+                # Faz o bind da fila com o exchange
                 channel.queue_bind(queue=WORKER_ID, exchange="mlapi_exchange", routing_key=WORKER_ID)
 
                 # Note: prefetch is set to 1 here as an example only and to keep the number of threads created

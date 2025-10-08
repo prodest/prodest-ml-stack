@@ -32,6 +32,8 @@ QUEUE_REG_RELOAD = {'next_reload': 0.0, 'delay_seconds': 300}
 # Ajuda a controlar a periodicidade de feedbacks solicitados globalmente e por modelo.
 NEXT_FEEDBACKS_MODELOS = {'next_global_feedback': -1.0}
 
+# TTL em milissegundos para jobs
+TTL_MS = 90000
 
 def reload_queue_registry():
     """
@@ -249,6 +251,9 @@ async def inference(cr: Annotated[
         timestamp = time()
         req_info['datetime'] = timestamp
 
+        # Inclui TTL no job (para que o /status saiba quando expirar)
+        req_info['ttl'] = TTL_MS
+
         resp_enfileirar = enfileirar_job(worker_id, model_name, info.client.host, req_info)
 
         if resp_enfileirar['status'] != "Done":
@@ -257,7 +262,7 @@ async def inference(cr: Annotated[
         try:
             # Coloca o status do job como 'Queued' e persiste
             dados_add = {'job_id': job_id, 'model_name': model_name, 'model_version': "", 'method': method,
-                         'datetime': timestamp, 'status': 'Queued', 'queue_response_time_sec': -1,
+                         'datetime': timestamp, 'ttl': TTL_MS, 'status': 'Queued', 'queue_response_time_sec': -1,
                          'total_response_time_sec': -1, 'response': ""}
 
             # Chaves específicas para o predict
@@ -266,6 +271,7 @@ async def inference(cr: Annotated[
                 dados_add['has_feedback'] = False
 
             insert_doc("col_jobs", dados_add)
+            
         except BaseException as e:
             LOGGER.error(f"Origem da requisição: IP={info.client.host}. Erro reportado: Não foi possível gerar o "
                          f"job. Erro na conexão com o banco de dados: {e.__class__} - {e}")
@@ -332,6 +338,15 @@ async def get_status(cr: Annotated[
             queue_response_time_sec = result['queue_response_time_sec']
             total_response_time_sec = result['total_response_time_sec']
             response = result['response']
+            ttl = result.get('ttl', TTL_MS)  # TTL salvo no momento da criação do job
+
+            # Verificação de expiração do job
+            if status in ("Queued", "Running") and ttl > 0:
+                elapsed_ms = (time() - datetime) * 1000  # diferença em milissegundos
+                if elapsed_ms > ttl:
+                    status = "Error"
+                    response = f"Job expirou após {ttl} ms sem ser processado."
+                    LOGGER.warning(f"Job {job_id} expirou (elapsed={elapsed_ms} ms > ttl={ttl} ms)")
 
             ret = {'job_id': job_id, 'model_name': model_name, 'model_version': model_version, 'method': method,
                    'status': status, 'datetime': datetime, 'queue_response_time_sec': queue_response_time_sec,
