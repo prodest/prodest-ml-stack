@@ -3,16 +3,15 @@
 # da Stack. Essas credenciais são gravadas em um arquivo chamado 'credentials_stack.txt' que é utilizado pelo script
 # 'modify_credentials_dockerfiles.sh' para modificar as credenciais.
 # --------------------------------------------------------------------------------------------------------------------
-import bcrypt
 from hashlib import sha256
 from time import time
 from numpy import random
 from jose import jwt
 from datetime import datetime
+from passlib.context import CryptContext
 
-# https://stackoverflow.com/questions/78628938/trapped-error-reading-bcrypt-version-v-4-1-2
-bcrypt.__about__ = bcrypt
-
+# Configura o Passlib para usar sha256_crypt
+pwd_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
 
 def generate_hash():
     """
@@ -20,8 +19,9 @@ def generate_hash():
         :return: Hash SHA-256 gerado.
     """
     # Gera chave aleatória para incluir no texto a ser passado para gerar o hash
-    lst_key_shuffled = list("mwiLCJhZG1pbiI6dHJ1ZSwiaWF0IjoxLjUxNjIzOTAyMjY2MjYzNjRlKzMwfQ.ERCga1Ed2DUPml0b4y03a0TsX"
-                            "YRjgSXWsmPyrBl0gFIe7Dr85ddsGDOj3vH2ucdj")
+    lst_key_shuffled = list(
+        "mwiLCJhZG1pbiI6dHJ1ZSwiaWF0IjoxLjUxNjIzOTAyMjY2MjYzNjRlKzMwfQ.ERCga1Ed2DUPml0b4y03a0TsXYRjgSXWsmPyrBl0gFIe7Dr85ddsGDOj3vH2ucdj"
+    )
     random.shuffle(lst_key_shuffled)
     key_shuffled = "".join(lst_key_shuffled)
 
@@ -34,27 +34,33 @@ def generate_hash():
 def generate_token():
     """
     Gera um token para acesso à API.
-        :return: Token gerado.
     """
     # Gera chave aleatória para incluir no texto a ser passado para gerar o hash
-    lst_key_shuffled = list("WNXF1dG80RENaU3dpYVdGMElqb3hMalV4TmpJek9UQXlNajd3OTJ0dkFyR1Ruc09FRllEIiwibmFtZSI6IkpvaG4"
-                            "gRG9lIGFzZmFkZmFkZmFzZmQiLCJpYXQiOjE1MTYyMjIzNDMzOTAyMn0.ju_NsELAYqYdET_qtmA9TSFOAnoQ4r"
-                            "HrERTuRioctQY")
+    lst_key_shuffled = list(
+        "WNXF1dG80RENaU3dpYVdGMElqb3hMalV4TmpJek9UQXlNajd3OTJ0dkFyR1Ruc09FRllEIiwibmFtZSI6IkpvaG4"
+        "gRG9lIGFzZmFkZmFkZmFzZmQiLCJpYXQiOjE1MTYyMjIzNDMzOTAyMn0.ju_NsELAYqYdET_qtmA9TSFOAnoQ4rHrERTuRioctQY"
+    )
     random.shuffle(lst_key_shuffled)
     key_shuffled = "".join(lst_key_shuffled)
 
-    # Cria os parâmetros para a geração do token
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    secret_key = pwd_context.hash(str(time()) + str(random.rand()) + key_shuffled + str(random.rand()))
+    # Gera string secreta e garante que não ultrapasse 72 caracteres
+    raw_secret = str(time()) + str(random.rand()) + key_shuffled + str(random.rand())
+    raw_secret_trunc = raw_secret[:72]  # truncar STRING, não bytes
+
+    # Passar string para Passlib
+    secret_key = pwd_context.hash(raw_secret_trunc)
+
     algorithm = "HS256"
-    data = {'system': 'ML API',
-            'gen_date': datetime.fromtimestamp(time()).strftime('%d/%m/%Y'),
-            'expires': 'never'}
+    data = {
+        'system': 'ML API',
+        'gen_date': datetime.fromtimestamp(time()).strftime('%d/%m/%Y'),
+        'expires': 'never'
+    }
 
     # Gera o token
     token = jwt.encode(data.copy(), secret_key, algorithm=algorithm)
-
     return token
+
 
 
 def generate_password():
@@ -63,8 +69,10 @@ def generate_password():
         :return: Senha gerada.
     """
     pwd_hash = generate_hash()
-    enxerto = "ABCDEFGHIJKLMNOPQRSTUVWXYZghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZghijklmnopqrstuvwxyzABCDEFGHI" \
-              "JKLMNOPQRSTUVWXYZghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZghijklmnopqrstuvwxyz"
+    enxerto = (
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZghijklmnopqrstuvwxyzABCDEFGHI"
+        "JKLMNOPQRSTUVWXYZghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZghijklmnopqrstuvwxyz"
+    )
     lst_passwd = list(pwd_hash + enxerto)
     random.shuffle(lst_passwd)
     passwd_shuffled = "".join(lst_passwd[:int(len(pwd_hash)/2)])
@@ -72,7 +80,6 @@ def generate_password():
 
 
 if __name__ == "__main__":
-    from passlib.context import CryptContext
     arq_cred = None
 
     # Gera as credenciais para o Compose File
@@ -154,7 +161,7 @@ if __name__ == "__main__":
 
     arq_cred.write("\n# **************** TOKEN PARA CONSUMIR A API (Passar --SOMENTE-- isso para o SYS ADMIN) *****"
                    "***********\n\n")
-
+    
     # API Token
     arq_cred.write(f"# API_TOKEN:\napi_token={generate_token()}\n\n")
 
