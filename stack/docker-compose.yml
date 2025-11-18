@@ -15,7 +15,7 @@ x-common-variables: &common-variables
 services:
   database:
     # https://hub.docker.com/_/mongo
-    image: mongo:8.0.14-noble
+    image: mongo:8.2.1-noble
     environment:
       <<: *stack-common-env
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
@@ -43,7 +43,7 @@ services:
 
   queue:
     # https://hub.docker.com/_/rabbitmq
-    image: rabbitmq:4.1.4-management-alpine
+    image: rabbitmq:4.2.1-management-alpine
     environment:
       <<: *stack-common-env
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
@@ -143,6 +143,7 @@ services:
       # troque mlflow pelo nome do bucket que desejar
       DEFAULT_ARTIFACT_ROOT: s3://mlflow/artefatos
       MLFLOW_FLASK_SERVER_SECRET_KEY: ${MLFLOW_FLASK_SERVER_SECRET_KEY}
+      MLFLOW_SERVER_ALLOWED_HOSTS: ${MLFLOW_SERVER_ALLOWED_HOSTS:-localhost,127.0.0.1,*}
     volumes:
       - ../model_registry/mlflow_data:/mlflow_data
     ports:

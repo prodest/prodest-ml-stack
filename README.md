@@ -185,7 +185,7 @@ Após alterar a configuração, saia do container (exit); **rode novamente** o c
 - Clique no botão **'Register Model'** e escolha a opção **'Create New Model'**;
 - Dê o nome **CLF_CYBER_BULLYING_TWEETS** para o modelo e clique em **'Register'**;
 - Na barra lateral esquerda clique em **'Models'**;
-- Clique no link para a última versão do modelo que está em **'Latest Version'**;
+- Clique no link do modelo registrado **CLF_CYBER_BULLYING_TWEETS** que está em **'Registered Models'**;
 - Na opção **'Aliases'**, clique em **'Add'**;
 - Digite **_production_** e clique em **'Save aliases'**.
 
