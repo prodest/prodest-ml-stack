@@ -6,6 +6,6 @@
 FROM python:3.12
 
 WORKDIR prodest-ml-stack
-RUN pip install --no-cache-dir --upgrade pip setuptools && pip install --no-cache-dir numpy "python-jose[cryptography]==3.5.0" "passlib[sha256_crypt]==1.7.4"
+RUN pip install --no-cache-dir --upgrade pip setuptools && pip install --no-cache-dir numpy==2.3.5 "python-jose[cryptography]==3.5.0" "passlib[sha256_crypt]==1.7.4"
 
 CMD ["/bin/bash", "temp_builder/modify_credentials_dockerfiles.sh"]
