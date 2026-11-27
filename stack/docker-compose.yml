@@ -11,11 +11,16 @@ x-common-variables: &common-variables
   MLFLOW_TRACKING_PASSWORD: ${MLFLOW_TRACKING_PASSWORD}
   AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
   AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+  # Silencia os logs de C++ do TensorFlow (oneDNN, cuda_platform, cpu_feature_guard...). Precisa estar no ambiente do
+  # container, pois o TF lê essas variáveis no import e os scripts só as definiam depois dele. A stack não usa GPU.
+  # Obs.: não desativamos TF_ENABLE_ONEDNN_OPTS, pois isso mudaria resultados numéricos e desempenho.
+  TF_CPP_MIN_LOG_LEVEL: "3"
+  CUDA_VISIBLE_DEVICES: "-1"
 
 services:
   database:
     # https://hub.docker.com/_/mongo
-    image: mongo:8.3.7-noble
+    image: mongo:9.0.2-noble
     environment:
       <<: *stack-common-env
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
@@ -43,7 +48,7 @@ services:
 
   queue:
     # https://hub.docker.com/_/rabbitmq
-    image: rabbitmq:4.3.4-management-alpine
+    image: rabbitmq:4.4.1-management-alpine
     environment:
       <<: *stack-common-env
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
@@ -69,8 +74,14 @@ services:
       start_period: 60s
 
   storage:
-    # https://hub.docker.com/r/minio/minio
-    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    # Armazenamento S3 compatível: Silo (fork comunitário do MinIO, AGPLv3, sem licença/cadastro).
+    # Substitui minio/minio, cujas imagens foram removidas do Docker Hub. Mesmos MINIO_*, API S3 e formato de dados.
+    # Versão: altere SILO_IMAGE_TAG (no ambiente ou aqui, no valor padrão após ":-"); sempre uma tag RELEASE.* fixa.
+    # Segurança: a RELEASE.2026-11-09 tinha avisos críticos (SN-2026-020 e SN-2026-022); segundo o próprio projeto,
+    # foram corrigidos na RELEASE.2026-11-12. Revise https://silo.pgsty.com/blog/security/ a cada atualização.
+    # As portas abaixo ficam restritas a 127.0.0.1 (stack de testes); só publique na rede se necessário.
+    # https://hub.docker.com/r/pgsty/silo
+    image: pgsty/silo:${SILO_IMAGE_TAG:-RELEASE.2026-11-12T00-00-00Z}
     volumes:
       - ../storage/minio_data:/data
     environment:
@@ -79,8 +90,8 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server /data --console-address :9001
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
     deploy:
       resources:
         limits:
@@ -91,8 +102,8 @@ services:
         delay: 30s
         max_attempts: 5
         window: 60s
-    healthcheck: # Conforme: https://min.io/docs/minio/linux/operations/monitoring/healthcheck-probe.html
-      test: curl -I http://localhost:9000/minio/health/cluster || exit 1
+    healthcheck: # Comando nativo do Silo: https://silo.pgsty.com/docs/ (não depende de shell/curl na imagem)
+      test: ["CMD", "silo", "healthcheck", "cluster"]
       interval: 600s
       timeout: 120s
       retries: 1
@@ -143,6 +154,9 @@ services:
       # troque mlflow pelo nome do bucket que desejar
       DEFAULT_ARTIFACT_ROOT: s3://mlflow/artefatos
       MLFLOW_FLASK_SERVER_SECRET_KEY: ${MLFLOW_FLASK_SERVER_SECRET_KEY}
+      # O MLflow (basic-auth) não traz mais senha padrão para o admin e não inicia sem ela. O usuário vem do
+      # basic_auth.ini (ajustado em modify_conf_mlflow.sh); a senha é a mesma gerada em credentials_stack.txt.
+      MLFLOW_AUTH_ADMIN_PASSWORD: ${MLFLOW_TRACKING_PASSWORD}
       MLFLOW_SERVER_ALLOWED_HOSTS: ${MLFLOW_SERVER_ALLOWED_HOSTS:-localhost,127.0.0.1,*}
     volumes:
       - ../model_registry/mlflow_data:/mlflow_data

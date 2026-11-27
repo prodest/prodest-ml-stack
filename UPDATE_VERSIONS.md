@@ -89,6 +89,11 @@ Altere a versão da imagem para a nova versão, conforme nome da imagem destacad
 
 ![alt text](docs/compose_file_alterado.png)
 
+**Imagem do Storage (`pgsty/silo`)**: a versão fica na variável `SILO_IMAGE_TAG`, no formato `image: pgsty/silo:${SILO_IMAGE_TAG:-RELEASE.AAAA-MM-DDTHH-MM-SSZ}`.
+Altere somente o valor padrão (depois de `:-`), mantendo a variável. As tags do Silo são datas (`RELEASE.2026-11-09T00-00-00Z`): escolha a mais
+recente **sem** sufixos (`-distroless`, `-amd64`, `-arm64`) e, antes, confira em https://silo.pgsty.com/blog/security/ se há avisos
+pendentes de correção em release publicada. O script `update_ml_stack_mllib_modeloteste.py --step 2` já faz essa sugestão automaticamente.
+
 Faça o mesmo processo para as outras imagens que constam no arquivo **docker-compose.yml**.
 
 **ATENÇÃO**: Parar evitar a "quebra" dos componentes da Stack, **JAMAIS** deixe as versões das imagens apontadas para _latest_! Sempre coloque a versão específica que desejar.

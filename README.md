@@ -19,7 +19,7 @@ e adaptar o código do seu modelo de acordo com as premissas definidas pela bibl
 - **Queue**: Recebe os Jobs gerados pela API e os organiza em filas. Os 'Workers Pub' retiram estes Jobs das
   respectivas filas; realizam o processamento; e enviam os resultados diretamente para API, sem enfileirá-los.
 - **Database**: Armazena os Jobs gerados pelas requisições das aplicações clientes. Também guarda a estrutura que define qual fila um determinado Worker consumirá.
-- **Storage**: Local onde o 'Model Registry' persiste os artefatos dos modelos registrados.
+- **Storage**: Local onde o 'Model Registry' persiste os artefatos dos modelos registrados. Servidor S3 compatível: [Silo](https://silo.pgsty.com/) (fork comunitário do MinIO, AGPLv3), que não exige cadastro nem licença. Veja a seção 'Storage (Silo)' abaixo.
 - **Model Registry**: Componente onde os modelos e seus artefatos são registrados para serem utilizados pelos Workers Pub e Retrain.
 - **Worker Pub**: Utiliza os modelos registrados para atender aos Jobs gerados e enfileirados pela API, provenientes das requisições das aplicações clientes.
 - **Worker Retrain**: Avalia periodicamente os modelos registrados e, se necessário, faz o retreino e registra o novo modelo
@@ -180,14 +180,27 @@ Após alterar a configuração, saia do container (exit); **rode novamente** o c
 
 ### 2.1. Registre o modelo treinado:
 
-- Acesse o MLflow (http://localhost:5000) e clique no experimento **CLF-Cyberbullying_Tweets**;
-- Clique no link para o experimento que está na coluna **'Models'**;
-- Clique no botão **'Register Model'** e escolha a opção **'Create New Model'**;
-- Dê o nome **CLF_CYBER_BULLYING_TWEETS** para o modelo e clique em **'Register'**;
-- Na barra lateral esquerda clique em **'Models'**;
-- Clique no link do modelo registrado **CLF_CYBER_BULLYING_TWEETS** que está em **'Registered Models'**;
-- Na opção **'Aliases'**, clique em **'Add'**;
-- Digite **_production_** e clique em **'Save aliases'**.
+- Acesse o MLflow (http://localhost:5000) e, quando solicitado, informe o usuário e a senha do **Model Registry (MLflow)**
+  (campos **'admin_username'** e **'admin_password'** do arquivo **'credentials_stack.txt'**);
+- Clique no experimento **CLF-Cyberbullying_Tweets**;
+- No menu lateral esquerdo, selecione **'Model training'** e depois **'Runs'**. Na coluna **'Models'** da execução que
+  foi treinada, clique no link **'model'** (a página do modelo mostra a etiqueta **'Not registered'**);
+
+![MLflow - Runs](docs/mlflow_runs.png)
+
+- Clique no botão **'Register model'** (canto superior direito); na janela que abrir, clique na lista **'Model'** e
+  escolha a opção **'Create New Model'**;
+
+![MLflow - Register model](docs/mlflow_registrar_modelo.png)
+
+- Em **'Model Name'**, digite **CLF_CYBER_BULLYING_TWEETS** e clique em **'Register'**;
+- No menu lateral esquerdo clique em **'Model registry'**;
+- Clique no modelo registrado **CLF_CYBER_BULLYING_TWEETS** que está em **'Registered Models'**;
+- Na tabela **'Versions'**, clique em **'Add'** na coluna **'Aliases'** da versão registrada (se a versão já tiver um
+  alias, clique no ícone de lápis ao lado dele);
+- Digite **_production_**, pressione **ENTER** e clique em **'Save aliases'**.
+
+![MLflow - Alias production](docs/mlflow_alias_production.png)
 
 ### 2.2. (Opcional) Acessar a console do container de treinamento.
 
@@ -376,7 +389,8 @@ de execução (diária, semanal, etc.).
 ### 4.1. Verifique se uma nova execução do experimento foi criada:
 
 - Acesse o MLflow (http://localhost:5000) e clique no experimento **CLF-Cyberbullying_Tweets**;
-- Observe se na coluna **'Run Name'** tem uma execução chamada **'self_training'**.
+- No menu lateral esquerdo, selecione **'Model training'** e depois **'Runs'**;
+- Observe se na coluna **'Run Name'** tem uma execução chamada **'self_training'** (veja a imagem do passo **2.1**).
 
 Se a nova execução foi criada com sucesso, ela é passível de ser registrada (conforme descrito no passo **2.1**) como um novo modelo no estágio de
 produção, para ser utilizado pela API.
@@ -500,7 +514,7 @@ as instruções abaixo para realizar um teste simples de _stress_.
 
 ```bash
 pip install --upgrade pip setuptools
-pip install requests==2.32.5
+pip install requests==2.34.2
 ```
 
 - Execute o script que fará o teste de _stress_; observe a execução e as mensagens na tela.
@@ -640,9 +654,29 @@ Se quiser subir o serviço **autoheal** novamente, troque **stop** por **start**
 
 - **Model Registry (MLflow)**: http://localhost:5000
 
-- **Console de administração do Storage (Minio)**: http://localhost:9001
+- **Console de administração do Storage (Silo)**: http://localhost:9001
 
 - **Queue (RabbitMQ)**: http://localhost:15672
+
+## Storage (Silo)
+
+O serviço `storage` usa a imagem [`pgsty/silo`](https://hub.docker.com/r/pgsty/silo), no lugar de `minio/minio` (imagens removidas
+do Docker Hub). O Silo é um fork comunitário do MinIO sob AGPLv3, **sem cadastro nem licença**. Foram mantidos o nome do serviço
+(`storage`), as variáveis `MINIO_ROOT_USER`/`MINIO_ROOT_PASSWORD`, a API S3 (porta 9000), o console (porta 9001) e o formato
+dos dados em `storage/minio_data`.
+
+- **Versão**: definida em um único lugar, `SILO_IMAGE_TAG` em `stack/docker-compose.yml` (valor padrão após `:-`). Use sempre uma tag
+  `RELEASE.<data>Z` fixa, nunca `latest`. Para testar outra versão sem editar o arquivo: `SILO_IMAGE_TAG=RELEASE.... ./docker-compose up -d storage`.
+- **Segurança**: a `RELEASE.2026-11-09` tinha avisos críticos (SN-2026-020 e SN-2026-022). Segundo o próprio projeto, foram corrigidos na
+  `RELEASE.2026-11-12T00-00-00Z` (versão configurada). Revise https://silo.pgsty.com/blog/security/ a cada atualização. As portas 9000 e 9001
+  ficam publicadas somente em `127.0.0.1`; só as exponha na rede se necessário.
+- **Atualizar a versão**: (1) confirme no link acima que o aviso foi corrigido em uma release publicada e que a tag existe
+  no Docker Hub; (2) altere o valor padrão de `SILO_IMAGE_TAG` (ou deixe o `--step 2` do script de atualização sugerir); (3) **faça backup
+  de `storage/minio_data` inteiro (incluindo `.minio.sys`)** antes de subir a nova versão sobre dados existentes; (4) `docker compose up -d storage`
+  e confira `docker ps` (healthy). Nunca use `docker compose down -v`.
+- **Dados existentes do MinIO**: o Silo mantém o formato em disco, mas grava metadados novos ao iniciar; não presuma que voltar para o
+  MinIO antigo seja possível. Mantenha o backup.
+- **Healthcheck**: `silo healthcheck cluster` (comando nativo, usado também pelo `autoheal`).
 
 ## 7. Destruir a Stack
 

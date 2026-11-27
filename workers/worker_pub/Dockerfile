@@ -6,8 +6,8 @@ RUN useradd -m pubuser && mkdir /worker_pub
 WORKDIR /worker_pub
 COPY . .
 
-RUN pip install --no-cache-dir --upgrade pip==26.2 setuptools==83.0.0 && pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir pika==1.4.2 requests==2.34.2
+RUN pip install --no-cache-dir --upgrade pip==26.3 setuptools==84.2.1 && pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir pika==1.5.0 requests==2.34.2
 
 RUN chown -R pubuser:pubuser /worker_pub && chgrp -R 0 /worker_pub && chmod -R g=u /worker_pub
 

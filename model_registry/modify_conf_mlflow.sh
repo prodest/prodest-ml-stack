@@ -11,6 +11,8 @@ source /tmp/url_signup.txt
 source /tmp/mlflow_cred.txt
 
 # Substituindo as configurações default do admin do MLFlow
+# Obs.: nas versões recentes do MLflow o basic_auth.ini não traz mais 'admin_password = password1234' (o sed da senha
+# abaixo não casa mais); a senha do admin passa a ser informada no container via MLFLOW_AUTH_ADMIN_PASSWORD (docker-compose.yml).
 sed -i "s/admin_username[[:space:]]=[[:space:]]admin/admin_username = $MLFLOW_TRACKING_USERNAME/" $PY_INST_DIR/mlflow/server/auth/basic_auth.ini
 sed -i "s/admin_password[[:space:]]=[[:space:]]password1234/admin_password = $MLFLOW_TRACKING_PASSWORD/" $PY_INST_DIR/mlflow/server/auth/basic_auth.ini
 
